@@ -1,5 +1,39 @@
 # Project Progress Log
 
+## Session: Database Setup (Sept 29, 2025)
+
+### ✅ Completed
+- Set up Supabase project (call_app_1)
+- Created database schema with 4 tables:
+  - sessions: Anonymous user tracking with interests/country preferences
+  - call_history: Last 5 calls per user with timestamps and partner info
+  - reports: User reports for moderation (reason, timestamps)
+  - bans: Banned users tracking (auto-ban at 3 reports/2hrs)
+- Established database connection using Supabase client
+- Tested connection successfully
+
+### 🔧 Technical Notes
+- Database credentials currently hardcoded in src/lib/supabase/client.ts
+- TODO: Switch to environment variables before production deploy
+- Supabase URL: https://skyffnybsqwfbbkbqcxy.supabase.co
+- Tables created via SQL Editor, schema stored in src/lib/supabase/schema.sql
+
+### 🎯 Next Steps (Priority Order)
+1. Online user count - Connect to real Socket.io count (10 min)
+2. Connect filters to matching algorithm (20 min)
+3. Enable auto-call checkbox (10 min)
+4. Call history system - Store/display last 5 calls (1-2 hours)
+5. Report system with auto-ban logic (2-3 hours)
+6. Additional pages: About, Contact, Blog (1-2 hours)
+7. Footer with links (30 min)
+
+### ⚠️ Known Issues
+- Environment variables not loading correctly in Next.js 15 + Turbopack
+- Using hardcoded credentials as temporary workaround
+- Need to fix before Vercel deployment
+
+---
+
 ## [2025-09-29] - Filters UI Complete
 **Added:**
 - Filters menu slides out from left with smooth animations
