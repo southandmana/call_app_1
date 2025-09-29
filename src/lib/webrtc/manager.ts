@@ -23,6 +23,7 @@ export interface WebRTCManager {
 class WebRTCManagerClass implements WebRTCManager {
   private eventListeners: Map<string, Function[]> = new Map();
   private socketListenersSetup: boolean = false;
+  private isManualHangup: boolean = false;
   peer: Peer.Instance | null = null;
   localStream: MediaStream | null = null;
   remoteAudio: HTMLAudioElement | null = null;
@@ -69,12 +70,12 @@ class WebRTCManagerClass implements WebRTCManager {
 
     socketManager.onCallEnded = () => {
       console.log('Call ended by peer');
-      this.endCall();
+      this.endCall(false); // Partner ended call
     };
 
     socketManager.onPeerDisconnected = () => {
       console.log('Peer disconnected');
-      this.endCall();
+      this.endCall(false); // Partner disconnected
     };
 
     this.socketListenersSetup = true;
@@ -170,9 +171,13 @@ class WebRTCManagerClass implements WebRTCManager {
     }
   }
 
-  endCall(): void {
-    // Notify signaling server
-    socketManager.endCall();
+  endCall(isManual: boolean = true): void {
+    this.isManualHangup = isManual;
+
+    // Notify signaling server only if manual hangup
+    if (isManual) {
+      socketManager.endCall();
+    }
 
     if (this.peer) {
       this.peer.destroy();
@@ -193,7 +198,7 @@ class WebRTCManagerClass implements WebRTCManager {
 
     this.isMuted = false;
     this.setState('idle');
-    this.emit('callEnded');
+    this.emit('callEnded', { wasManualHangup: isManual });
   }
 
   toggleMute(): boolean {

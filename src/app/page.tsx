@@ -29,8 +29,23 @@ export default function Home() {
       setCallState('connected');
     });
 
-    manager.on('callEnded', () => {
-      setCallState('idle');
+    manager.on('callEnded', (data: { wasManualHangup: boolean }) => {
+      // Auto-call logic: if enabled and partner disconnected (not manual hangup)
+      if (autoCallEnabled && !data.wasManualHangup) {
+        console.log('Auto-call enabled, restarting search in 2 seconds...');
+        setCallState('searching');
+
+        setTimeout(async () => {
+          try {
+            await manager.startCall(userFilters);
+          } catch (error) {
+            console.error('Auto-call failed:', error);
+            setCallState('idle');
+          }
+        }, 2000);
+      } else {
+        setCallState('idle');
+      }
     });
 
     // Listen for connection state changes to handle searching state
@@ -40,14 +55,17 @@ export default function Home() {
       } else if (state === 'connected') {
         setCallState('connected');
       } else if (state === 'idle' || state === 'disconnected') {
-        setCallState('idle');
+        // Don't override searching state during auto-call delay
+        if (callState !== 'searching' || !autoCallEnabled) {
+          setCallState('idle');
+        }
       }
     };
 
     return () => {
       manager.disconnect();
     };
-  }, []);
+  }, [autoCallEnabled, userFilters]);
 
   // Connect socket and listen for user count updates
   useEffect(() => {
@@ -110,6 +128,9 @@ export default function Home() {
   };
 
   const getCallButtonText = () => {
+    if (callState === 'searching' && autoCallEnabled) {
+      return 'Searching for next caller...';
+    }
     switch (callState) {
       case 'searching': return 'Searching...';
       case 'connected': return 'Hang Up';

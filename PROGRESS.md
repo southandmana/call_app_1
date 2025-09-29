@@ -1,6 +1,13 @@
 # Project Progress Log
 
-## Session: Online User Count + Filter Matching (Sept 29, 2025)
+## Session: Online User Count + Filter Matching + Auto-Call (Sept 29, 2025)
+
+### ✅ Auto-Call Checkbox (Completed - Sept 29, 2025)
+- Checkbox now functional (was UI-only before)
+- Auto-restarts search 2 seconds after partner disconnects
+- Shows "Searching for next caller..." message during delay
+- Respects user preference - only auto-restarts when checked
+- Does NOT auto-restart on manual hangup
 
 ### ✅ Interest-Based Filter Matching (Completed - Sept 29, 2025)
 - Users can select interests before calling
