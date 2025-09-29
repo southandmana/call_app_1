@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { WebRTCManager } from '@/lib/webrtc/manager';
 import { socketManager } from '@/lib/webrtc/socket-client';
 import FiltersMenu, { UserFilters } from '@/components/FiltersMenu';
@@ -21,6 +21,19 @@ export default function Home() {
     nonPreferredCountries: []
   });
 
+  // Use refs to access current values in callbacks
+  const autoCallEnabledRef = useRef(autoCallEnabled);
+  const userFiltersRef = useRef(userFilters);
+
+  // Keep refs in sync with state
+  useEffect(() => {
+    autoCallEnabledRef.current = autoCallEnabled;
+  }, [autoCallEnabled]);
+
+  useEffect(() => {
+    userFiltersRef.current = userFilters;
+  }, [userFilters]);
+
   useEffect(() => {
     const manager = new WebRTCManager();
     setWebrtcManager(manager);
@@ -31,13 +44,13 @@ export default function Home() {
 
     manager.on('callEnded', (data: { wasManualHangup: boolean }) => {
       // Auto-call logic: if enabled and partner disconnected (not manual hangup)
-      if (autoCallEnabled && !data.wasManualHangup) {
+      if (autoCallEnabledRef.current && !data.wasManualHangup) {
         console.log('Auto-call enabled, restarting search in 2 seconds...');
         setCallState('searching');
 
         setTimeout(async () => {
           try {
-            await manager.startCall(userFilters);
+            await manager.startCall(userFiltersRef.current);
           } catch (error) {
             console.error('Auto-call failed:', error);
             setCallState('idle');
