@@ -1,6 +1,14 @@
 # Project Progress Log
 
-## Session: Online User Count (Sept 29, 2025)
+## Session: Online User Count + Filter Matching (Sept 29, 2025)
+
+### ✅ Interest-Based Filter Matching (Completed - Sept 29, 2025)
+- Users can select interests before calling
+- Queue system matches users with compatible interests
+- Users with overlapping interests get matched together
+- Users with no interests match with anyone
+- Country filtering marked as TODO (requires geolocation or manual input)
+- Tested with multiple browser tabs - filtering works correctly
 
 ### ✅ Online User Count Feature (Completed - Sept 29, 2025)
 - Server tracks connected Socket.io clients in real-time

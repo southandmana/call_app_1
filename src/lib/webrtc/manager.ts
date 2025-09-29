@@ -230,7 +230,7 @@ class WebRTCManagerClass implements WebRTCManager {
   }
 
   // Required interface methods
-  async startCall(): Promise<void> {
+  async startCall(filters?: { interests: string[]; preferredCountries: string[]; nonPreferredCountries: string[] }): Promise<void> {
     try {
       // Setup socket listeners first
       this.setupSocketListeners();
@@ -238,8 +238,8 @@ class WebRTCManagerClass implements WebRTCManager {
       // Connect to signaling server
       await socketManager.connect();
 
-      // Start searching for a match
-      socketManager.startCall();
+      // Start searching for a match with filters
+      socketManager.startCall(filters);
 
       // Don't emit callStarted here - wait for onMatched callback
     } catch (error) {

@@ -101,9 +101,13 @@ class SocketManagerClass implements SocketManager {
     }
   }
 
-  startCall(): void {
+  startCall(filters?: { interests: string[]; preferredCountries: string[]; nonPreferredCountries: string[] }): void {
     if (this.socket?.connected) {
-      this.socket.emit('join-queue');
+      this.socket.emit('join-queue', filters || {
+        interests: [],
+        preferredCountries: [],
+        nonPreferredCountries: []
+      });
     }
   }
 

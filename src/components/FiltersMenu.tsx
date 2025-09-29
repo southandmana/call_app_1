@@ -3,12 +3,19 @@
 import { useState, useRef, useEffect } from 'react';
 import { countries, Country } from '@/lib/countries';
 
+export interface UserFilters {
+  interests: string[];
+  preferredCountries: string[]; // country codes
+  nonPreferredCountries: string[]; // country codes
+}
+
 interface FiltersMenuProps {
   isOpen: boolean;
   onClose: () => void;
+  onApplyFilters?: (filters: UserFilters) => void;
 }
 
-export default function FiltersMenu({ isOpen, onClose }: FiltersMenuProps) {
+export default function FiltersMenu({ isOpen, onClose, onApplyFilters }: FiltersMenuProps) {
   const [interests, setInterests] = useState<string[]>([]);
   const [interestInput, setInterestInput] = useState('');
   const [preferredCountries, setPreferredCountries] = useState<Country[]>([]);
@@ -84,12 +91,14 @@ export default function FiltersMenu({ isOpen, onClose }: FiltersMenuProps) {
   }, []);
 
   const handleApply = () => {
-    // TODO: Apply filters logic
-    console.log('Applying filters:', {
+    const filters: UserFilters = {
       interests,
-      preferredCountries,
-      nonPreferredCountries
-    });
+      preferredCountries: preferredCountries.map(c => c.code),
+      nonPreferredCountries: nonPreferredCountries.map(c => c.code)
+    };
+
+    console.log('Applying filters:', filters);
+    onApplyFilters?.(filters);
     onClose();
   };
 

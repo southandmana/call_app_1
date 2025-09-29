@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { WebRTCManager } from '@/lib/webrtc/manager';
 import { socketManager } from '@/lib/webrtc/socket-client';
-import FiltersMenu from '@/components/FiltersMenu';
+import FiltersMenu, { UserFilters } from '@/components/FiltersMenu';
 import { testConnection } from '@/lib/supabase/test';
 
 type CallState = 'idle' | 'searching' | 'connected';
@@ -15,6 +15,11 @@ export default function Home() {
   const [webrtcManager, setWebrtcManager] = useState<WebRTCManager | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState(0);
+  const [userFilters, setUserFilters] = useState<UserFilters>({
+    interests: [],
+    preferredCountries: [],
+    nonPreferredCountries: []
+  });
 
   useEffect(() => {
     const manager = new WebRTCManager();
@@ -70,7 +75,7 @@ export default function Home() {
 
     if (callState === 'idle') {
       try {
-        await webrtcManager.startCall();
+        await webrtcManager.startCall(userFilters);
         // State will be updated by onStateChange callback
       } catch (error) {
         console.error('Failed to start call:', error);
@@ -80,6 +85,11 @@ export default function Home() {
       webrtcManager.endCall();
       // State will be updated by onStateChange callback
     }
+  };
+
+  const handleApplyFilters = (filters: UserFilters) => {
+    setUserFilters(filters);
+    console.log('Filters applied:', filters);
   };
 
   const handleMute = () => {
@@ -265,6 +275,7 @@ export default function Home() {
       <FiltersMenu
         isOpen={isFiltersOpen}
         onClose={() => setIsFiltersOpen(false)}
+        onApplyFilters={handleApplyFilters}
       />
     </div>
   );

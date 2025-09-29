@@ -20,6 +20,30 @@ function broadcastUserCount() {
   console.log('Broadcasting user count:', userCount);
 }
 
+// Function to check if two users' filters are compatible
+function areFiltersCompatible(filters1, filters2) {
+  // If both have interests, they must share at least one
+  if (filters1.interests.length > 0 && filters2.interests.length > 0) {
+    const hasCommonInterest = filters1.interests.some(interest =>
+      filters2.interests.includes(interest)
+    );
+    if (!hasCommonInterest) {
+      console.log('No common interests');
+      return false;
+    }
+  }
+
+  // Check preferred countries (if user1 has preferred, user2 must be from one of them)
+  // Note: We don't have user countries yet, so we'll skip this for now
+  // TODO: Add country detection or user selection
+
+  // Check non-preferred countries (never match with users from these countries)
+  // Note: We don't have user countries yet, so we'll skip this for now
+  // TODO: Add country detection or user selection
+
+  return true;
+}
+
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
@@ -27,13 +51,25 @@ io.on('connection', (socket) => {
   broadcastUserCount();
 
   // Handle user joining the queue
-  socket.on('join-queue', () => {
-    console.log('User joined queue:', socket.id);
+  socket.on('join-queue', (filters) => {
+    console.log('User joined queue:', socket.id, 'with filters:', filters);
 
-    // Check if there's someone waiting
-    if (waitingQueue.length > 0) {
-      // Match with the first person in queue
-      const waitingUser = waitingQueue.shift();
+    // Store filters with the socket
+    socket.userFilters = filters || { interests: [], preferredCountries: [], nonPreferredCountries: [] };
+
+    // Try to find a compatible match
+    let matchedIndex = -1;
+    for (let i = 0; i < waitingQueue.length; i++) {
+      const waitingUser = waitingQueue[i];
+      if (areFiltersCompatible(socket.userFilters, waitingUser.userFilters)) {
+        matchedIndex = i;
+        break;
+      }
+    }
+
+    if (matchedIndex !== -1) {
+      // Found a compatible match
+      const waitingUser = waitingQueue.splice(matchedIndex, 1)[0];
       const roomId = `room-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
       // Create room and add both users
