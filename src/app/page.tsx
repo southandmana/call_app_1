@@ -42,9 +42,9 @@ export default function Home() {
       setCallState('connected');
     });
 
-    manager.on('callEnded', (data: { wasManualHangup: boolean }) => {
-      // Auto-call logic: if enabled and partner disconnected (not manual hangup)
-      if (autoCallEnabledRef.current && !data.wasManualHangup) {
+    manager.on('callEnded', () => {
+      // Auto-call logic: if enabled, always restart (regardless of who ended it)
+      if (autoCallEnabledRef.current) {
         console.log('Auto-call enabled, restarting search in 2 seconds...');
         setCallState('searching');
 
