@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { WebRTCManager } from '@/lib/webrtc/manager';
+import FiltersMenu from '@/components/FiltersMenu';
 
 type CallState = 'idle' | 'searching' | 'connected';
 
@@ -10,6 +11,7 @@ export default function Home() {
   const [isMuted, setIsMuted] = useState(false);
   const [autoCallEnabled, setAutoCallEnabled] = useState(false);
   const [webrtcManager, setWebrtcManager] = useState<WebRTCManager | null>(null);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   useEffect(() => {
     const manager = new WebRTCManager();
@@ -106,7 +108,14 @@ export default function Home() {
             <span className="text-sm">0</span>
           </div>
         </div>
-        <button className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900">
+        <button
+          onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+          className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+            isFiltersOpen
+              ? 'text-green-600 bg-green-50'
+              : 'text-gray-700 hover:text-gray-900'
+          } px-3 py-2 rounded-lg`}
+        >
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
           </svg>
@@ -211,6 +220,12 @@ export default function Home() {
       <div className="bg-gray-200 h-20 m-4 rounded-lg flex items-center justify-center text-gray-500 text-sm">
         Advertisement Placeholder
       </div>
+
+      {/* Filters Menu */}
+      <FiltersMenu
+        isOpen={isFiltersOpen}
+        onClose={() => setIsFiltersOpen(false)}
+      />
     </div>
   );
 }
