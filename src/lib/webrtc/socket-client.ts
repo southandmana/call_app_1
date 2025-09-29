@@ -11,6 +11,7 @@ export interface SocketManager {
   onCallEnded?: () => void;
   onPeerDisconnected?: () => void;
   onUserCount?: (count: number) => void;
+  onAuthRequired?: (data: { message: string }) => void;
 }
 
 class SocketManagerClass implements SocketManager {
@@ -22,6 +23,7 @@ class SocketManagerClass implements SocketManager {
   onCallEnded?: () => void;
   onPeerDisconnected?: () => void;
   onUserCount?: (count: number) => void;
+  onAuthRequired?: (data: { message: string }) => void;
 
   connect(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -30,11 +32,17 @@ class SocketManagerClass implements SocketManager {
         return;
       }
 
+      // Get session ID from localStorage
+      const sessionId = typeof window !== 'undefined' ? localStorage.getItem('session_id') : null;
+
       this.socket = io('http://localhost:3001', {
         forceNew: true,
         reconnection: true,
         timeout: 10000,
-        transports: ['websocket', 'polling']
+        transports: ['websocket', 'polling'],
+        auth: {
+          sessionId: sessionId
+        }
       });
 
       this.socket.on('connect', () => {
@@ -85,6 +93,12 @@ class SocketManagerClass implements SocketManager {
       this.socket.on('user-count', (count: number) => {
         console.log('User count updated:', count);
         this.onUserCount?.(count);
+      });
+
+      // Handle auth required
+      this.socket.on('auth-required', (data: { message: string }) => {
+        console.log('Authentication required:', data.message);
+        this.onAuthRequired?.(data);
       });
     });
   }

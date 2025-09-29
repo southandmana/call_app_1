@@ -4,7 +4,9 @@ import { useState, useEffect, useRef } from 'react';
 import { WebRTCManager } from '@/lib/webrtc/manager';
 import { socketManager } from '@/lib/webrtc/socket-client';
 import FiltersMenu, { UserFilters } from '@/components/FiltersMenu';
+import PhoneVerification from '@/components/PhoneVerification';
 import { testConnection } from '@/lib/supabase/test';
+import axios from 'axios';
 
 type CallState = 'idle' | 'searching' | 'connected';
 
@@ -15,6 +17,8 @@ export default function Home() {
   const [webrtcManager, setWebrtcManager] = useState<WebRTCManager | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState(0);
+  const [showVerification, setShowVerification] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
   const [userFilters, setUserFilters] = useState<UserFilters>({
     interests: [],
     preferredCountries: [],
@@ -33,6 +37,39 @@ export default function Home() {
   useEffect(() => {
     userFiltersRef.current = userFilters;
   }, [userFilters]);
+
+  // Check phone verification on mount
+  useEffect(() => {
+    const checkVerification = async () => {
+      const sessionId = localStorage.getItem('session_id');
+
+      if (!sessionId) {
+        setShowVerification(true);
+        return;
+      }
+
+      // Verify session is still valid
+      try {
+        const response = await axios.post('/api/session/status', { sessionId });
+        if (response.data.verified) {
+          setIsVerified(true);
+          setShowVerification(false);
+        } else {
+          setShowVerification(true);
+        }
+      } catch (error) {
+        console.error('Session validation failed:', error);
+        setShowVerification(true);
+      }
+    };
+
+    checkVerification();
+  }, []);
+
+  const handleVerificationSuccess = (sessionId: string) => {
+    setIsVerified(true);
+    setShowVerification(false);
+  };
 
   useEffect(() => {
     const manager = new WebRTCManager();
@@ -87,6 +124,12 @@ export default function Home() {
         socketManager.onUserCount = (count: number) => {
           setOnlineUsers(count);
         };
+
+        socketManager.onAuthRequired = (data: { message: string }) => {
+          console.log('Auth required:', data.message);
+          setShowVerification(true);
+          setIsVerified(false);
+        };
       } catch (error) {
         console.error('Failed to connect socket for user count:', error);
       }
@@ -96,6 +139,7 @@ export default function Home() {
 
     return () => {
       socketManager.onUserCount = undefined;
+      socketManager.onAuthRequired = undefined;
     };
   }, []);
 
@@ -309,6 +353,11 @@ export default function Home() {
         onClose={() => setIsFiltersOpen(false)}
         onApplyFilters={handleApplyFilters}
       />
+
+      {/* Phone Verification Modal */}
+      {showVerification && (
+        <PhoneVerification onVerificationSuccess={handleVerificationSuccess} />
+      )}
     </div>
   );
 }
