@@ -11,9 +11,18 @@ export interface WebRTCManager {
   onStateChange?: (state: ConnectionState) => void;
   onSignalData?: (data: any) => void;
   onError?: (error: Error) => void;
+
+  // Methods
+  startCall(): Promise<void>;
+  endCall(): void;
+  toggleMute(): boolean;
+  on(event: string, callback: Function): void;
+  disconnect(): void;
 }
 
 class WebRTCManagerClass implements WebRTCManager {
+  private eventListeners: Map<string, Function[]> = new Map();
+  private socketListenersSetup: boolean = false;
   peer: Peer.Instance | null = null;
   localStream: MediaStream | null = null;
   remoteAudio: HTMLAudioElement | null = null;
@@ -26,6 +35,49 @@ class WebRTCManagerClass implements WebRTCManager {
   private setState(newState: ConnectionState) {
     this.connectionState = newState;
     this.onStateChange?.(newState);
+  }
+
+  private setupSocketListeners(): void {
+    if (this.socketListenersSetup) return;
+
+    socketManager.onMatched = async (data) => {
+      console.log('Matched with peer:', data);
+      try {
+        await this.initializePeer(data.isInitiator);
+        this.emit('callStarted');
+      } catch (error) {
+        console.error('Failed to initialize peer after match:', error);
+        this.setState('idle');
+      }
+    };
+
+    socketManager.onWaiting = () => {
+      console.log('Waiting for match...');
+      this.setState('connecting');
+    };
+
+    socketManager.onSignal = async (data) => {
+      console.log('Received signal:', data);
+      if (this.peer) {
+        try {
+          await this.connectToPeer(data.signal);
+        } catch (error) {
+          console.error('Failed to handle signal:', error);
+        }
+      }
+    };
+
+    socketManager.onCallEnded = () => {
+      console.log('Call ended by peer');
+      this.endCall();
+    };
+
+    socketManager.onPeerDisconnected = () => {
+      console.log('Peer disconnected');
+      this.endCall();
+    };
+
+    this.socketListenersSetup = true;
   }
 
   async initializePeer(isInitiator: boolean = false): Promise<void> {
@@ -141,6 +193,7 @@ class WebRTCManagerClass implements WebRTCManager {
 
     this.isMuted = false;
     this.setState('idle');
+    this.emit('callEnded');
   }
 
   toggleMute(): boolean {
@@ -160,7 +213,48 @@ class WebRTCManagerClass implements WebRTCManager {
   isConnected(): boolean {
     return this.connectionState === 'connected';
   }
+
+  // Event system methods
+  on(event: string, callback: Function): void {
+    if (!this.eventListeners.has(event)) {
+      this.eventListeners.set(event, []);
+    }
+    this.eventListeners.get(event)!.push(callback);
+  }
+
+  private emit(event: string, data?: any): void {
+    const listeners = this.eventListeners.get(event);
+    if (listeners) {
+      listeners.forEach(callback => callback(data));
+    }
+  }
+
+  // Required interface methods
+  async startCall(): Promise<void> {
+    try {
+      // Setup socket listeners first
+      this.setupSocketListeners();
+
+      // Connect to signaling server
+      await socketManager.connect();
+
+      // Start searching for a match
+      socketManager.startCall();
+
+      // Don't emit callStarted here - wait for onMatched callback
+    } catch (error) {
+      console.error('Failed to start call:', error);
+      this.setState('idle');
+      throw error;
+    }
+  }
+
+  disconnect(): void {
+    this.endCall();
+    socketManager.disconnect();
+  }
 }
 
-// Export singleton instance
+// Export the class and singleton instance
+export const WebRTCManager = WebRTCManagerClass;
 export const webrtcManager = new WebRTCManagerClass();

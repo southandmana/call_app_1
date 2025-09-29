@@ -93,6 +93,12 @@ class SocketManagerClass implements SocketManager {
     }
   }
 
+  startCall(): void {
+    if (this.socket?.connected) {
+      this.socket.emit('join-queue');
+    }
+  }
+
   sendSignal(signal: any): void {
     if (this.socket?.connected) {
       this.socket.emit('signal', { signal });
