@@ -13,8 +13,8 @@ export interface WebRTCManager {
   onError?: (error: Error) => void;
 
   // Methods
-  startCall(): Promise<void>;
-  endCall(): void;
+  startCall(filters?: { interests: string[]; preferredCountries: string[]; nonPreferredCountries: string[] }): Promise<void>;
+  endCall(isManual?: boolean): void;
   toggleMute(): boolean;
   on(event: string, callback: Function): void;
   disconnect(): void;

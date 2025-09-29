@@ -55,17 +55,15 @@ export default function Home() {
       } else if (state === 'connected') {
         setCallState('connected');
       } else if (state === 'idle' || state === 'disconnected') {
-        // Don't override searching state during auto-call delay
-        if (callState !== 'searching' || !autoCallEnabled) {
-          setCallState('idle');
-        }
+        setCallState('idle');
       }
     };
 
     return () => {
       manager.disconnect();
     };
-  }, [autoCallEnabled, userFilters]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Connect socket and listen for user count updates
   useEffect(() => {
