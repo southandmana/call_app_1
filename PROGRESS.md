@@ -3,11 +3,12 @@
 ## Session: Online User Count + Filter Matching + Auto-Call (Sept 29, 2025)
 
 ### ✅ Auto-Call Checkbox (Completed - Sept 29, 2025)
-- Checkbox now functional (was UI-only before)
-- Auto-restarts search 2 seconds after partner disconnects
-- Shows "Searching for next caller..." message during delay
+- Checkbox now fully functional (was UI-only before)
+- Auto-restarts search 2 seconds after ANY call ends (manual hangup or partner disconnect)
+- Shows "Searching for next caller..." message during 2-second delay
 - Respects user preference - only auto-restarts when checked
-- Does NOT auto-restart on manual hangup
+- Fixed stale closure bug using refs to access current state values
+- Maintains user's filter preferences during auto-reconnection
 
 ### ✅ Interest-Based Filter Matching (Completed - Sept 29, 2025)
 - Users can select interests before calling
