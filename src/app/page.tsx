@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { WebRTCManager } from '@/lib/webrtc/manager';
+import { socketManager } from '@/lib/webrtc/socket-client';
 import FiltersMenu from '@/components/FiltersMenu';
 import { testConnection } from '@/lib/supabase/test';
 
@@ -13,6 +14,7 @@ export default function Home() {
   const [autoCallEnabled, setAutoCallEnabled] = useState(false);
   const [webrtcManager, setWebrtcManager] = useState<WebRTCManager | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [onlineUsers, setOnlineUsers] = useState(0);
 
   useEffect(() => {
     const manager = new WebRTCManager();
@@ -39,6 +41,27 @@ export default function Home() {
 
     return () => {
       manager.disconnect();
+    };
+  }, []);
+
+  // Connect socket and listen for user count updates
+  useEffect(() => {
+    const connectSocket = async () => {
+      try {
+        await socketManager.connect();
+
+        socketManager.onUserCount = (count: number) => {
+          setOnlineUsers(count);
+        };
+      } catch (error) {
+        console.error('Failed to connect socket for user count:', error);
+      }
+    };
+
+    connectSocket();
+
+    return () => {
+      socketManager.onUserCount = undefined;
     };
   }, []);
 
@@ -111,7 +134,7 @@ export default function Home() {
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
             </svg>
-            <span className="text-sm">0</span>
+            <span className="text-sm">{onlineUsers}</span>
           </div>
         </div>
         <button

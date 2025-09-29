@@ -1,5 +1,22 @@
 # Project Progress Log
 
+## Session: Online User Count (Sept 29, 2025)
+
+### ✅ Online User Count Feature (Completed - Sept 29, 2025)
+- Server tracks connected Socket.io clients in real-time
+- Broadcasts user count on connect/disconnect events
+- Homepage displays live count instead of hardcoded "0"
+- Tested with multiple browser tabs - count updates correctly
+- Socket.io server runs on port 3001, Next.js on port 3000
+
+### 🔧 Technical Implementation
+- Modified socket-server.js to broadcast user count via `io.engine.clientsCount`
+- Added `user-count` event listener in socket-client.ts
+- Homepage connects to socket on page load to receive live updates
+- Fixed WebSocket connection issues by ensuring Socket.io server starts before Next.js
+
+---
+
 ## Session: Database Setup (Sept 29, 2025)
 
 ### ✅ Completed

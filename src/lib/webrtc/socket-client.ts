@@ -10,6 +10,7 @@ export interface SocketManager {
   onSignal?: (data: { signal: any; from: string }) => void;
   onCallEnded?: () => void;
   onPeerDisconnected?: () => void;
+  onUserCount?: (count: number) => void;
 }
 
 class SocketManagerClass implements SocketManager {
@@ -20,6 +21,7 @@ class SocketManagerClass implements SocketManager {
   onSignal?: (data: { signal: any; from: string }) => void;
   onCallEnded?: () => void;
   onPeerDisconnected?: () => void;
+  onUserCount?: (count: number) => void;
 
   connect(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -77,6 +79,12 @@ class SocketManagerClass implements SocketManager {
       this.socket.on('peer-disconnected', () => {
         console.log('Peer disconnected');
         this.onPeerDisconnected?.();
+      });
+
+      // Handle user count updates
+      this.socket.on('user-count', (count: number) => {
+        console.log('User count updated:', count);
+        this.onUserCount?.(count);
       });
     });
   }

@@ -13,8 +13,18 @@ const io = new Server(httpServer, {
 let waitingQueue = [];
 let activeConnections = new Map(); // socketId -> { peerId, roomId }
 
+// Function to broadcast user count to all clients
+function broadcastUserCount() {
+  const userCount = io.engine.clientsCount;
+  io.emit('user-count', userCount);
+  console.log('Broadcasting user count:', userCount);
+}
+
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
+
+  // Broadcast updated user count
+  broadcastUserCount();
 
   // Handle user joining the queue
   socket.on('join-queue', () => {
@@ -117,6 +127,9 @@ io.on('connection', (socket) => {
       activeConnections.delete(connection.peerId);
       activeConnections.delete(socket.id);
     }
+
+    // Broadcast updated user count
+    broadcastUserCount();
   });
 });
 
