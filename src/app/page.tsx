@@ -68,6 +68,16 @@ export default function Home() {
   // Check phone verification on mount
   useEffect(() => {
     const checkVerification = async () => {
+      // Feature flag: bypass phone verification for testing
+      const bypassVerification = process.env.NEXT_PUBLIC_BYPASS_PHONE_VERIFICATION === 'true';
+
+      if (bypassVerification) {
+        console.log('🚧 Phone verification bypassed (feature flag enabled)');
+        setIsVerified(true);
+        setShowVerification(false);
+        return;
+      }
+
       const sessionId = localStorage.getItem('session_id');
 
       if (!sessionId) {

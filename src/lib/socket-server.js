@@ -55,37 +55,44 @@ function areFiltersCompatible(filters1, filters2) {
 io.on('connection', async (socket) => {
   console.log('User connected:', socket.id);
 
-  // Validate session authentication
-  const sessionId = socket.handshake.auth.sessionId;
+  // Feature flag: bypass phone verification for testing
+  const bypassVerification = process.env.NEXT_PUBLIC_BYPASS_PHONE_VERIFICATION === 'true';
 
-  if (!sessionId) {
-    console.log('Connection rejected: No session ID provided');
-    socket.emit('auth-required', { message: 'Phone verification required' });
-    socket.disconnect();
-    return;
-  }
+  if (bypassVerification) {
+    console.log('🚧 Phone verification bypassed (feature flag enabled) for:', socket.id);
+  } else {
+    // Validate session authentication
+    const sessionId = socket.handshake.auth.sessionId;
 
-  // Verify session with Supabase
-  try {
-    const { data: session, error } = await supabase
-      .from('sessions')
-      .select('phone_verified')
-      .eq('session_id', sessionId)
-      .single();
-
-    if (error || !session || !session.phone_verified) {
-      console.log('Connection rejected: Invalid or unverified session');
+    if (!sessionId) {
+      console.log('Connection rejected: No session ID provided');
       socket.emit('auth-required', { message: 'Phone verification required' });
       socket.disconnect();
       return;
     }
 
-    console.log('User authenticated successfully:', socket.id);
-  } catch (error) {
-    console.error('Auth validation error:', error);
-    socket.emit('auth-required', { message: 'Authentication error' });
-    socket.disconnect();
-    return;
+    // Verify session with Supabase
+    try {
+      const { data: session, error } = await supabase
+        .from('sessions')
+        .select('phone_verified')
+        .eq('session_id', sessionId)
+        .single();
+
+      if (error || !session || !session.phone_verified) {
+        console.log('Connection rejected: Invalid or unverified session');
+        socket.emit('auth-required', { message: 'Phone verification required' });
+        socket.disconnect();
+        return;
+      }
+
+      console.log('User authenticated successfully:', socket.id);
+    } catch (error) {
+      console.error('Auth validation error:', error);
+      socket.emit('auth-required', { message: 'Authentication error' });
+      socket.disconnect();
+      return;
+    }
   }
 
   // Broadcast updated user count
