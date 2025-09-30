@@ -1,8 +1,14 @@
-require('dotenv').config({ path: '.env.local' });
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../../.env.local') });
 
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 const { createClient } = require('@supabase/supabase-js');
+
+// Debug: Log environment variables on startup
+console.log('🔧 Environment variables loaded:');
+console.log('  NEXT_PUBLIC_BYPASS_PHONE_VERIFICATION:', process.env.NEXT_PUBLIC_BYPASS_PHONE_VERIFICATION);
+console.log('  NEXT_PUBLIC_SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ? '✓ Set' : '✗ Missing');
 
 // Initialize Supabase client
 const supabase = createClient(
