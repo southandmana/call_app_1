@@ -2,32 +2,40 @@
 
 ---
 
-## 🚨 CURRENT STATUS - READY TO DEPLOY
+## 🚨 CURRENT STATUS - DEPLOYED TO PRODUCTION ✅
 
-**Last Working Commit:** [This commit - backup before deployment]
+**Production URLs:**
+- 🌐 **Frontend:** https://call-app-1.vercel.app
+- 🔌 **Socket.io:** https://callapp1-production.up.railway.app
+- 💾 **Database:** Supabase (skyffnybsqwfbbkbqcxy.supabase.co)
 
-**What Works Locally:**
+**Deployment Status:**
+- ✅ Railway deployment complete (Socket.io server)
+- ✅ Vercel deployment complete (Next.js frontend)
+- ✅ Environment variables configured on both platforms
+- ✅ CORS configured for production
+- ✅ Health check endpoint functional
+- ⏳ Cross-browser testing in progress
+
+**What Works in Production:**
 - ✅ Voice calling between users (WebRTC)
 - ✅ Interest-based matching
 - ✅ Online user count (real-time)
 - ✅ Error handling (mic permission, connection drops, no users)
 - ✅ Phone verification bypass for testing
-- ✅ Two-tab local testing successful
-- ✅ Socket.io on port 3001
-- ✅ Next.js on port 3000
+- ✅ Chrome/Firefox tested successfully
 
-**Next Immediate Steps:**
-1. [ ] Deploy Socket.io server to Railway
-2. [ ] Deploy Next.js frontend to Vercel
-3. [ ] Update CORS and connection URLs for production
-4. [ ] Test with friends at deployed URL
+**Known Issues:**
+- 🐛 Safari Socket.io connection issue (needs debugging)
 
-**⚠️ BACKUP PLAN:**
+**Last Deployed Commit:** 9a0fab7 "disable linting for deployment"
+
+**⚠️ ROLLBACK PLAN:**
 If deployment breaks anything, revert to this commit:
 ```bash
-git log  # Find this commit hash
-git reset --hard [commit-hash]
-# Redeploy from working state
+git reset --hard 9a0fab7
+git push --force origin main
+# Railway and Vercel will auto-redeploy
 ```
 
 ---
@@ -251,9 +259,20 @@ NEXT_PUBLIC_BYPASS_PHONE_VERIFICATION=true  # Currently bypassed for testing
 
 ---
 
+## Immediate Next Steps
+
+### 1. Debug Safari Socket.io Connection Issue (30 min - 1 hour)
+- [ ] Test Safari connection with detailed console logging
+- [ ] Check for WebSocket protocol incompatibilities
+- [ ] Verify CORS headers in Safari
+- [ ] Test on Safari iOS vs Safari macOS
+- [ ] Check Socket.io client compatibility with Safari
+
+---
+
 ## Next Features to Build (Priority Order)
 
-### 1. Call History System (1-2 hours)
+### 2. Call History System (1-2 hours)
 - [ ] Display last 5 calls on homepage
 - [ ] Store call data in Supabase (call_history table already exists)
 - [ ] Show: timestamp, duration, report status

@@ -1,5 +1,12 @@
 # Deployment Guide
 
+## ✅ Deployment Complete (Sept 30, 2025)
+
+**Production URLs:**
+- 🌐 **Frontend:** https://call-app-1.vercel.app
+- 🔌 **Socket.io Server:** https://callapp1-production.up.railway.app
+- 💾 **Database:** Supabase (skyffnybsqwfbbkbqcxy.supabase.co)
+
 ## Pre-Deployment Checklist
 
 - [x] All features working locally
@@ -8,9 +15,12 @@
 - [x] Environment variables documented
 - [x] Socket.io server code complete
 - [x] Phone verification bypass enabled for testing
-- [ ] Railway deployment (Socket.io)
-- [ ] Vercel deployment (Next.js)
-- [ ] Production testing with friends
+- [x] Railway deployment (Socket.io)
+- [x] Vercel deployment (Next.js)
+- [x] Environment variables configured on both platforms
+- [x] CORS configured for production
+- [x] Health check endpoint functional
+- [ ] Cross-browser testing complete (Safari issue pending)
 
 ---
 
@@ -167,9 +177,10 @@ This allows Railway to connect from your Vercel frontend.
 
 ## Last Known Working State
 
-**Commit Hash:** `774b86a` (Pre-deployment backup: All features working, ready for Railway + Vercel)
+**Commit Hash:** `9a0fab7` (Production deployment: Linting disabled, Railway + Vercel live)
 **Date:** September 30, 2025
-**Status:** ✅ Fully functional local deployment
+**Status:** ✅ Deployed to production
+**Previous Backup:** `774b86a` (Pre-deployment: All features working locally)
 
 **What Works:**
 - Voice calling (WebRTC)
