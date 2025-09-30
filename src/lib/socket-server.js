@@ -10,10 +10,20 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
-const httpServer = createServer();
+const httpServer = createServer((req, res) => {
+  // Health check endpoint for Railway
+  if (req.url === '/health' || req.url === '/') {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('OK');
+  } else {
+    res.writeHead(404);
+    res.end('Not Found');
+  }
+});
+
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: process.env.FRONTEND_URL || "http://localhost:3000",
     methods: ["GET", "POST"],
     credentials: true
   }
@@ -219,10 +229,12 @@ io.on('connection', async (socket) => {
   });
 });
 
-const PORT = process.env.SOCKET_PORT || 3001;
+// Railway assigns PORT dynamically, fallback to 3001 for local dev
+const PORT = process.env.PORT || process.env.SOCKET_PORT || 3001;
 
 httpServer.listen(PORT, () => {
   console.log(`Socket.IO server running on port ${PORT}`);
+  console.log(`Health check available at http://localhost:${PORT}/health`);
 });
 
 // Graceful shutdown
