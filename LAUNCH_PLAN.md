@@ -231,10 +231,14 @@
 - Filters UI (interests, countries)
 - Phone verification API integration
 - Socket.io authentication
-
-### ⏳ In Progress:
-- Phone verification (waiting Telnyx approval, 24-48 hours)
 - Feature flag for bypassing verification during testing
+
+### ⏳ In Progress / Waiting:
+- **IMPORTANT: Phone verification currently BYPASSED for testing**
+  - Feature flag `NEXT_PUBLIC_BYPASS_PHONE_VERIFICATION=true` in .env.local
+  - Waiting for Telnyx number approval (24-48 hours)
+  - **ACTION REQUIRED**: Once approved, test SMS works, then set flag to `false` before public launch
+  - See TODO.md "Phone Verification - PENDING APPROVAL" section for checklist
 
 ### ❌ Not Started:
 - Call history feature

@@ -180,16 +180,32 @@
 
 ## Phone Verification - PENDING APPROVAL ⏳
 
-### Telnyx Number Activation
-- [ ] Wait for Telnyx documentation approval (check email in 24-48 hours)
+### 🚨 CURRENT STATUS: BYPASSED FOR TESTING
+**Phone verification is currently DISABLED via feature flag to allow friend testing before Telnyx approval.**
+
+**Feature flag location**: `.env.local`
+```bash
+NEXT_PUBLIC_BYPASS_PHONE_VERIFICATION=true  # Currently bypassed for testing
+```
+
+### ⚠️ CRITICAL: Before Public Launch Checklist
+- [ ] **MUST DO**: Set `NEXT_PUBLIC_BYPASS_PHONE_VERIFICATION=false` in .env.local
+- [ ] Restart Next.js dev server
+- [ ] Restart Socket.io server
+- [ ] Test that phone verification modal appears
+- [ ] Verify unverified users cannot connect to Socket.io
+
+### Telnyx Number Activation (Waiting 24-48 hours)
+- [ ] Wait for Telnyx documentation approval (check email)
 - [ ] Once approved, test SMS sending with real phone number
 - [ ] Verify rate limiting works (5 attempts/hour per phone)
 - [ ] Test code expiration (5 minutes)
 - [ ] Test max attempts per code (3 attempts)
 - [ ] Test Socket.io auth enforcement (disconnects unverified users)
 - [ ] Test session validation on page reload
+- [ ] **AFTER TESTING WORKS**: Set bypass flag to `false` in production
 
-**Note**: Phone verification code is complete and committed. Telnyx phone number (+6498734038) requires documentation review before it can send SMS. This is a standard Telnyx compliance requirement.
+**Note**: Phone verification code is complete and committed. Telnyx phone number (+6498734038) requires documentation review before it can send SMS. This is a standard Telnyx compliance requirement. The bypass flag allows testing with friends in the meantime.
 
 ---
 
