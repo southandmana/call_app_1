@@ -1,3 +1,5 @@
+require('dotenv').config({ path: '.env.local' });
+
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 const { createClient } = require('@supabase/supabase-js');
@@ -118,7 +120,7 @@ io.on('connection', async (socket) => {
     if (matchedIndex !== -1) {
       // Found a compatible match
       const waitingUser = waitingQueue.splice(matchedIndex, 1)[0];
-      const roomId = `room-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const roomId = `room-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 
       // Create room and add both users
       socket.join(roomId);
