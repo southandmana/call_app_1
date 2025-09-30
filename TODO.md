@@ -1,5 +1,183 @@
 # TODO: Pending Tasks
 
+---
+
+## 🚨 LAUNCH READINESS - Required Before Public Release
+
+### BLOCKING ISSUES (Cannot launch without these)
+
+#### Legal Compliance (Est: 2-3 days + legal review)
+- [ ] **Terms of Service document**
+  - User conduct rules (no harassment, hate speech, illegal activity)
+  - Liability limitations (not responsible for user meetups)
+  - Account termination policy (ban conditions)
+  - Dispute resolution process
+  - **Action**: Draft or hire lawyer ($500-2000)
+  - **Risk**: Launching without ToS = no legal protection
+
+- [ ] **Privacy Policy document**
+  - What data is collected (phone numbers, call metadata, IP addresses, session data)
+  - How data is stored and protected (Supabase encryption, Telnyx compliance)
+  - Data retention periods (how long we keep call history, reports)
+  - User rights (access, deletion, portability under GDPR/CCPA)
+  - Third-party services (Telnyx, Supabase, Vercel)
+  - Cookie policy
+  - **Action**: Draft or hire lawyer ($500-2000)
+  - **Risk**: GDPR fines up to €20M or 4% revenue, CCPA fines up to $7,500 per violation
+
+- [ ] **Age Verification Enhancement**
+  - Current: Phone verification only (insufficient legal protection)
+  - Required: Government ID verification or credit card check
+  - Liability risk: Minors accessing dating platform = massive legal exposure
+  - Alternatives:
+    - Telnyx Identity Verification (~$0.50/check)
+    - Stripe Identity (~$1.50/check)
+    - Manual ID review (labor intensive)
+  - **Action**: Implement ID verification (2-3 hours integration)
+  - **Risk**: COPPA violations = $50,120 per violation, potential criminal charges
+
+#### Safety Infrastructure (Est: 1-2 weeks)
+- [ ] **Moderation System**
+  - Who reviews reports? (You? Hire moderator? Automated AI?)
+  - Response time SLA (24 hours? 72 hours?)
+  - Escalation process for serious threats (suicide, violence, minors)
+  - Moderator training materials
+  - **Action**: Define process, hire moderator ($15-25/hr) OR implement automated review
+  - **Cost**: $2,000-4,000/month for part-time moderator
+
+- [ ] **Incident Response Plan**
+  - What happens when user reports assault/harassment after meetup?
+  - Contact law enforcement protocol (when and how?)
+  - Evidence preservation (call logs, reports, ban history)
+  - Victim support resources (hotlines, counseling services)
+  - Documentation requirements for legal requests
+  - **Action**: Write documented procedure (1 day)
+  - **Risk**: Improper handling = lawsuits, bad PR, regulatory scrutiny
+
+- [ ] **Content Moderation Policy**
+  - Instant ban: Threats, hate speech, solicitation, minors, drugs
+  - Warning: Spam, mild rudeness, excessive disconnects
+  - Manual review: Gray areas, appeals
+  - Appeals process (how users contest bans)
+  - Ban duration (permanent vs temporary)
+  - **Action**: Write policy document (4-6 hours)
+  - **Risk**: Inconsistent moderation = discrimination lawsuits
+
+#### Operational Requirements (Est: 1-2 days setup + ongoing)
+- [ ] **Support System**
+  - Dedicated support email (support@airtalk.com)
+  - Expected response time (24-48 hours)
+  - FAQ/Help documentation
+  - Ticketing system (e.g., Zendesk, Freshdesk)
+  - **Action**: Set up support email, write FAQ (1 day)
+  - **Cost**: Free (email) to $49+/month (ticketing system)
+
+- [ ] **Monitoring & Alerts**
+  - Server uptime monitoring (UptimeRobot, Pingdom)
+  - Error tracking (Sentry, LogRocket)
+  - Usage analytics (PostHog, Mixpanel)
+  - Alert notifications (PagerDuty, Slack)
+  - **Action**: Set up monitoring tools (4-6 hours)
+  - **Cost**: Free tiers available, $10-100/month for paid plans
+
+- [ ] **Backup & Recovery**
+  - Database backups (automated daily via Supabase)
+  - Point-in-time recovery enabled
+  - Disaster recovery plan documented
+  - Test restore procedure quarterly
+  - **Action**: Configure Supabase backups, write recovery plan (1-2 hours)
+  - **Cost**: Included in Supabase Pro plan ($25/month)
+
+---
+
+### ⚠️ HIGH PRIORITY (Should have before launch)
+
+#### Enhanced Safety Features (Est: 1 week)
+- [ ] **Emergency Contact Sharing**
+  - Users can share their date details with a trusted friend
+  - "Check-in" feature to confirm safety after meetup
+  - Auto-notify emergency contact if check-in missed
+  - **Action**: Build feature (1-2 days)
+  - **Benefit**: Reduces liability, shows duty of care
+
+- [ ] **In-App Safety Resources**
+  - Link to crisis hotlines (suicide prevention, assault support)
+  - Safety tips for meeting strangers from internet
+  - How to spot red flags (controlling behavior, pressure tactics)
+  - Reporting harassment guide
+  - **Action**: Create resources page (4-6 hours)
+  - **Benefit**: Demonstrates platform responsibility
+
+- [ ] **Photo Verification (Optional but Recommended)**
+  - Verify user's identity with selfie
+  - Reduces catfishing and fake profiles
+  - Increases user trust
+  - **Action**: Integrate photo verification API (1 day)
+  - **Cost**: $0.50-1.50 per verification
+
+- [ ] **Block List Enhancements**
+  - Currently: Basic ban system exists
+  - Needed: Users can block specific people permanently
+  - Blocked users never matched again
+  - **Action**: Add user-level blocking (3-4 hours)
+
+#### Business Operations (Est: 2-3 weeks)
+- [ ] **Insurance**
+  - General liability insurance ($500-2,000/year)
+  - Cyber liability insurance ($1,000-7,500/year)
+  - Professional liability (E&O) insurance
+  - Check requirements based on jurisdiction
+  - **Action**: Consult insurance broker
+  - **Risk**: One lawsuit without insurance = bankruptcy
+
+- [ ] **Business Entity**
+  - Form LLC or C-Corp to limit personal liability
+  - Separate business bank account
+  - Business credit card for expenses
+  - EIN from IRS
+  - **Action**: Register business entity (varies by state)
+  - **Cost**: $100-800 for LLC filing + $800/year CA franchise tax
+
+- [ ] **Scaling Plan**
+  - Current: Socket.io server on single machine = single point of failure
+  - Needed: Load balancing, horizontal scaling, CDN
+  - Monitoring: When to spin up additional servers?
+  - Cost projections: What happens at 1K, 10K, 100K users?
+  - **Action**: Document scaling architecture (1-2 days)
+
+- [ ] **Revenue Model**
+  - Current: Free with no monetization
+  - Options: Ads, premium features, subscriptions
+  - Financial sustainability plan
+  - **Action**: Define monetization strategy
+
+#### Technical Hardening (Est: 1 week)
+- [ ] **Rate Limiting Everywhere**
+  - API routes (prevent abuse)
+  - Socket connections (prevent DDoS)
+  - Report submissions (prevent spam)
+  - **Action**: Add rate limits to all endpoints (1 day)
+
+- [ ] **SQL Injection Prevention Audit**
+  - Review all database queries
+  - Ensure parameterized queries
+  - Test with SQLMap
+  - **Action**: Security audit (1-2 days)
+
+- [ ] **XSS Prevention Audit**
+  - Review all user input rendering
+  - Ensure proper escaping
+  - Content Security Policy headers
+  - **Action**: Security audit (1-2 days)
+
+- [ ] **Environment Variable Security**
+  - Ensure no secrets in git history
+  - Use proper secret management (Vercel env vars, AWS Secrets Manager)
+  - Rotate all API keys before launch
+  - **Action**: Audit and rotate secrets (2-3 hours)
+
+---
+
 ## Phone Verification - PENDING APPROVAL ⏳
 
 ### Telnyx Number Activation
