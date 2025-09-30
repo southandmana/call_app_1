@@ -44,7 +44,10 @@ class SocketManagerClass implements SocketManager {
       // Get session ID from localStorage
       const sessionId = typeof window !== 'undefined' ? localStorage.getItem('session_id') : null;
 
-      this.socket = io('http://localhost:3001', {
+      // Use production Socket.io URL or fallback to localhost for development
+      const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001';
+
+      this.socket = io(socketUrl, {
         forceNew: true,
         reconnection: true,
         timeout: 10000,
