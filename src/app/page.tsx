@@ -73,6 +73,15 @@ export default function Home() {
 
       if (bypassVerification) {
         console.log('🚧 Phone verification bypassed (feature flag enabled)');
+
+        // Auto-create a test session_id for bypassed verification
+        let sessionId = localStorage.getItem('session_id');
+        if (!sessionId) {
+          sessionId = `test-session-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+          localStorage.setItem('session_id', sessionId);
+          console.log('🚧 Created test session_id:', sessionId);
+        }
+
         setIsVerified(true);
         setShowVerification(false);
         return;
@@ -103,7 +112,7 @@ export default function Home() {
     checkVerification();
   }, []);
 
-  const handleVerificationSuccess = (sessionId: string) => {
+  const handleVerificationSuccess = (_sessionId: string) => {
     setIsVerified(true);
     setShowVerification(false);
   };

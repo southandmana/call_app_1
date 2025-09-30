@@ -2,6 +2,18 @@
 
 ---
 
+## 📋 LAUNCH PLAN
+
+**See [LAUNCH_PLAN.md](./LAUNCH_PLAN.md) for the complete 6-week roadmap, timeline, and cost estimates.**
+
+This includes:
+- Week-by-week breakdown from beta testing to public launch
+- Investment summary: $2,500-6,000 upfront + $95-425/month
+- Risk assessment and mitigation strategies
+- Success metrics and go/no-go decision gates
+
+---
+
 ## 🚨 LAUNCH READINESS - Required Before Public Release
 
 ### BLOCKING ISSUES (Cannot launch without these)
