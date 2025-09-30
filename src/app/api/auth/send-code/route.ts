@@ -55,6 +55,12 @@ export async function POST(request: NextRequest) {
 
     // Send SMS via Telnyx
     try {
+      console.log('Sending SMS with Telnyx:', {
+        from: process.env.TELNYX_PHONE_NUMBER,
+        to: formattedPhone,
+        hasApiKey: !!process.env.TELNYX_API_KEY
+      });
+
       await axios.post(
         'https://api.telnyx.com/v2/messages',
         {
@@ -70,9 +76,13 @@ export async function POST(request: NextRequest) {
         }
       );
     } catch (error: any) {
-      console.error('Telnyx API error:', error.response?.data || error.message);
+      console.error('Telnyx API error details:', JSON.stringify(error.response?.data, null, 2));
+      const telnyxError = error.response?.data?.errors?.[0];
       return NextResponse.json(
-        { error: 'Failed to send SMS. Please try again.' },
+        {
+          error: telnyxError?.detail || 'Failed to send SMS. Please check your Telnyx configuration.',
+          telnyxError: telnyxError
+        },
         { status: 500 }
       );
     }
