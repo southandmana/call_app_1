@@ -12,11 +12,16 @@ export interface SocketManager {
   onPeerDisconnected?: () => void;
   onUserCount?: (count: number) => void;
   onAuthRequired?: (data: { message: string }) => void;
+  onDisconnected?: () => void;
+  onReconnecting?: () => void;
+  onReconnected?: () => void;
+  onSearchTimeout?: () => void;
 }
 
 class SocketManagerClass implements SocketManager {
   socket: Socket | null = null;
   isConnected: boolean = false;
+  private searchTimeout: NodeJS.Timeout | null = null;
   onMatched?: (data: { roomId: string; peerId: string; isInitiator: boolean }) => void;
   onWaiting?: () => void;
   onSignal?: (data: { signal: any; from: string }) => void;
@@ -24,6 +29,10 @@ class SocketManagerClass implements SocketManager {
   onPeerDisconnected?: () => void;
   onUserCount?: (count: number) => void;
   onAuthRequired?: (data: { message: string }) => void;
+  onDisconnected?: () => void;
+  onReconnecting?: () => void;
+  onReconnected?: () => void;
+  onSearchTimeout?: () => void;
 
   connect(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -51,9 +60,35 @@ class SocketManagerClass implements SocketManager {
         resolve();
       });
 
-      this.socket.on('disconnect', () => {
-        console.log('Disconnected from signaling server');
+      this.socket.on('disconnect', (reason) => {
+        console.log('Disconnected from signaling server:', reason);
         this.isConnected = false;
+        this.onDisconnected?.();
+
+        // Auto-reconnect unless manually disconnected
+        if (reason !== 'io client disconnect') {
+          this.onReconnecting?.();
+        }
+      });
+
+      this.socket.on('reconnect', (attemptNumber) => {
+        console.log('Reconnected to signaling server after', attemptNumber, 'attempts');
+        this.isConnected = true;
+        this.onReconnected?.();
+      });
+
+      this.socket.on('reconnect_attempt', (attemptNumber) => {
+        console.log('Reconnection attempt', attemptNumber);
+        this.onReconnecting?.();
+      });
+
+      this.socket.on('reconnect_error', (error) => {
+        console.error('Reconnection error:', error);
+      });
+
+      this.socket.on('reconnect_failed', () => {
+        console.error('Failed to reconnect to signaling server');
+        this.onDisconnected?.();
       });
 
       this.socket.on('connect_error', (error) => {
@@ -64,12 +99,26 @@ class SocketManagerClass implements SocketManager {
       // Handle matching events
       this.socket.on('matched', (data) => {
         console.log('Matched with peer:', data);
+        // Clear search timeout when matched
+        if (this.searchTimeout) {
+          clearTimeout(this.searchTimeout);
+          this.searchTimeout = null;
+        }
         this.onMatched?.(data);
       });
 
       this.socket.on('waiting', () => {
         console.log('Waiting for match...');
         this.onWaiting?.();
+
+        // Start 30-second timeout for "no users available"
+        if (this.searchTimeout) {
+          clearTimeout(this.searchTimeout);
+        }
+        this.searchTimeout = setTimeout(() => {
+          console.log('Search timeout - no users found');
+          this.onSearchTimeout?.();
+        }, 30000); // 30 seconds
       });
 
       // Handle signaling
@@ -112,6 +161,11 @@ class SocketManagerClass implements SocketManager {
   leaveQueue(): void {
     if (this.socket?.connected) {
       this.socket.emit('leave-queue');
+    }
+    // Clear search timeout
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = null;
     }
   }
 

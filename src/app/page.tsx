@@ -5,10 +5,13 @@ import { WebRTCManager } from '@/lib/webrtc/manager';
 import { socketManager } from '@/lib/webrtc/socket-client';
 import FiltersMenu, { UserFilters } from '@/components/FiltersMenu';
 import PhoneVerification from '@/components/PhoneVerification';
+import ErrorModal from '@/components/ErrorModal';
+import ErrorToast from '@/components/ErrorToast';
+import ErrorBanner from '@/components/ErrorBanner';
 import { testConnection } from '@/lib/supabase/test';
 import axios from 'axios';
 
-type CallState = 'idle' | 'searching' | 'connected';
+type CallState = 'idle' | 'searching' | 'connected' | 'no-users';
 
 export default function Home() {
   const [callState, setCallState] = useState<CallState>('idle');
@@ -24,6 +27,30 @@ export default function Home() {
     preferredCountries: [],
     nonPreferredCountries: []
   });
+
+  // Error states
+  const [errorModal, setErrorModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'mic-permission' | 'connection-failed' | 'general';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'general',
+  });
+  const [toastMessage, setToastMessage] = useState<{
+    isVisible: boolean;
+    message: string;
+    type: 'error' | 'info' | 'success';
+  }>({
+    isVisible: false,
+    message: '',
+    type: 'info',
+  });
+  const [isDisconnected, setIsDisconnected] = useState(false);
+  const [isReconnecting, setIsReconnecting] = useState(false);
 
   // Use refs to access current values in callbacks
   const autoCallEnabledRef = useRef(autoCallEnabled);
@@ -79,6 +106,36 @@ export default function Home() {
       setCallState('connected');
     });
 
+    manager.on('error', (data: { type: string; error: Error }) => {
+      console.error('WebRTC error:', data);
+      if (data.type === 'mic-permission') {
+        setErrorModal({
+          isOpen: true,
+          title: 'Microphone Access Required',
+          message: 'Voice calling requires access to your microphone. Please enable microphone permissions and reload the page.',
+          type: 'mic-permission',
+        });
+        setCallState('idle');
+      } else if (data.type === 'connection-failed') {
+        setErrorModal({
+          isOpen: true,
+          title: 'Connection Failed',
+          message: 'Unable to establish a connection with your partner. This may be due to network restrictions or firewall settings.',
+          type: 'connection-failed',
+        });
+        setCallState('idle');
+      }
+    });
+
+    manager.on('connectionDropped', () => {
+      setToastMessage({
+        isVisible: true,
+        message: 'Call disconnected. Your partner may have left or lost connection.',
+        type: 'error',
+      });
+      setCallState('idle');
+    });
+
     manager.on('callEnded', () => {
       // Auto-call logic: if enabled, always restart (regardless of who ended it)
       if (autoCallEnabledRef.current) {
@@ -130,6 +187,31 @@ export default function Home() {
           setShowVerification(true);
           setIsVerified(false);
         };
+
+        socketManager.onDisconnected = () => {
+          setIsDisconnected(true);
+          setIsReconnecting(false);
+        };
+
+        socketManager.onReconnecting = () => {
+          setIsReconnecting(true);
+          setIsDisconnected(false);
+        };
+
+        socketManager.onReconnected = () => {
+          setIsDisconnected(false);
+          setIsReconnecting(false);
+          setToastMessage({
+            isVisible: true,
+            message: 'Reconnected to server!',
+            type: 'success',
+          });
+        };
+
+        socketManager.onSearchTimeout = () => {
+          console.log('Search timeout - no users available');
+          setCallState('no-users');
+        };
       } catch (error) {
         console.error('Failed to connect socket for user count:', error);
       }
@@ -140,6 +222,10 @@ export default function Home() {
     return () => {
       socketManager.onUserCount = undefined;
       socketManager.onAuthRequired = undefined;
+      socketManager.onDisconnected = undefined;
+      socketManager.onReconnecting = undefined;
+      socketManager.onReconnected = undefined;
+      socketManager.onSearchTimeout = undefined;
     };
   }, []);
 
@@ -189,8 +275,16 @@ export default function Home() {
     switch (callState) {
       case 'searching': return 'Searching...';
       case 'connected': return 'Hang Up';
+      case 'no-users': return 'No Users Available';
       default: return 'Call';
     }
+  };
+
+  const handleCancelSearch = () => {
+    if (webrtcManager) {
+      webrtcManager.endCall();
+    }
+    setCallState('idle');
   };
 
   const getCallButtonClass = () => {
@@ -204,11 +298,31 @@ export default function Home() {
       return `${baseClass} bg-green-500 animate-pulse`;
     }
 
+    if (callState === 'no-users') {
+      return `${baseClass} bg-gray-500`;
+    }
+
     return `${baseClass} bg-green-500 hover:bg-green-600 hover:scale-105 animate-[radiating_2s_ease-in-out_infinite]`;
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Error/Connection Banner */}
+      {isReconnecting && (
+        <ErrorBanner
+          isVisible={true}
+          message="Connection lost. Reconnecting..."
+          type="info"
+        />
+      )}
+      {isDisconnected && !isReconnecting && (
+        <ErrorBanner
+          isVisible={true}
+          message="Disconnected from server. Please refresh the page."
+          type="error"
+        />
+      )}
+
       {/* Header */}
       <header className="flex justify-between items-center p-4 bg-white shadow-sm">
         <div className="flex items-center gap-4">
@@ -251,13 +365,26 @@ export default function Home() {
             <button
               onClick={handleCallClick}
               className={getCallButtonClass()}
-              disabled={callState === 'searching'}
+              disabled={callState === 'searching' || callState === 'no-users'}
             >
               <svg className="w-8 h-8 mb-1" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
               </svg>
             </button>
             <span className="text-sm font-medium mt-2 text-gray-700">{getCallButtonText()}</span>
+
+            {/* No users message */}
+            {callState === 'no-users' && (
+              <div className="mt-4 text-center">
+                <p className="text-sm text-gray-600 mb-3">No users available right now. Try adjusting your filters or wait a moment.</p>
+                <button
+                  onClick={handleCancelSearch}
+                  className="text-sm text-green-600 hover:text-green-700 font-medium underline"
+                >
+                  Try Again
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Control Buttons */}
@@ -358,6 +485,27 @@ export default function Home() {
       {showVerification && (
         <PhoneVerification onVerificationSuccess={handleVerificationSuccess} />
       )}
+
+      {/* Error Modal */}
+      <ErrorModal
+        isOpen={errorModal.isOpen}
+        title={errorModal.title}
+        message={errorModal.message}
+        type={errorModal.type}
+        onRetry={errorModal.type === 'connection-failed' ? () => {
+          setErrorModal({ ...errorModal, isOpen: false });
+          handleCallClick();
+        } : undefined}
+        onClose={() => setErrorModal({ ...errorModal, isOpen: false })}
+      />
+
+      {/* Toast Notifications */}
+      <ErrorToast
+        isVisible={toastMessage.isVisible}
+        message={toastMessage.message}
+        type={toastMessage.type}
+        onClose={() => setToastMessage({ ...toastMessage, isVisible: false })}
+      />
     </div>
   );
 }

@@ -86,15 +86,24 @@ class WebRTCManagerClass implements WebRTCManager {
       this.setState('creating');
 
       // Get user media (audio only)
-      this.localStream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-          sampleRate: 48000
-        },
-        video: false
-      });
+      try {
+        this.localStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+            sampleRate: 48000
+          },
+          video: false
+        });
+      } catch (micError: any) {
+        console.error('Microphone access denied:', micError);
+        const error = new Error('MICROPHONE_PERMISSION_DENIED');
+        (error as any).originalError = micError;
+        this.emit('error', { type: 'mic-permission', error });
+        this.setState('idle');
+        throw error;
+      }
 
       // Create reusable audio element for remote audio
       if (!this.remoteAudio) {
@@ -140,12 +149,18 @@ class WebRTCManagerClass implements WebRTCManager {
       // Handle errors
       this.peer.on('error', (err) => {
         console.error('Peer error:', err);
+        this.emit('error', { type: 'connection-failed', error: err });
         this.onError?.(err);
         this.setState('disconnected');
       });
 
       // Handle close
       this.peer.on('close', () => {
+        console.log('Peer connection closed');
+        if (this.connectionState === 'connected') {
+          // Connection dropped mid-call
+          this.emit('connectionDropped');
+        }
         this.setState('disconnected');
       });
 
