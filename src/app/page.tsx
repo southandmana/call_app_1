@@ -63,6 +63,7 @@ export default function Home() {
   // Use refs to access current values in callbacks
   const autoCallEnabledRef = useRef(autoCallEnabled);
   const userFiltersRef = useRef(userFilters);
+  const webrtcManagerRef = useRef<WebRTCManager | null>(null);
 
   // Keep refs in sync with state
   useEffect(() => {
@@ -173,7 +174,11 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const manager = new WebRTCManager();
+    // Reuse existing manager if available (prevents duplication on HMR)
+    if (!webrtcManagerRef.current) {
+      webrtcManagerRef.current = new WebRTCManager();
+    }
+    const manager = webrtcManagerRef.current;
     setWebrtcManager(manager);
 
     manager.on('callStarted', () => {
@@ -242,6 +247,7 @@ export default function Home() {
 
     return () => {
       manager.disconnect();
+      webrtcManagerRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -420,7 +426,7 @@ export default function Home() {
       case 'searching': return 'Looking for someone interesting...';
       case 'connected': return 'You\'re talking with a stranger';
       case 'no-users': return 'Try again in a moment or adjust your filters';
-      default: return 'Press the button below to start a voice call';
+      default: return 'Press the button below to start a voice call ';
     }
   };
 

@@ -36,9 +36,17 @@ class SocketManagerClass implements SocketManager {
 
   connect(): Promise<void> {
     return new Promise((resolve, reject) => {
+      // If already connected, just resolve
       if (this.socket?.connected) {
         resolve();
         return;
+      }
+
+      // If socket exists but not connected, clean it up first
+      if (this.socket) {
+        this.socket.removeAllListeners();
+        this.socket.disconnect();
+        this.socket = null;
       }
 
       // Get session ID from localStorage
@@ -48,8 +56,11 @@ class SocketManagerClass implements SocketManager {
       const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001';
 
       this.socket = io(socketUrl, {
-        forceNew: true,
+        forceNew: false,
         reconnection: true,
+        reconnectionDelay: 1000,        // Wait 1 second before first reconnect
+        reconnectionDelayMax: 5000,     // Max 5 seconds between reconnect attempts
+        reconnectionAttempts: Infinity, // Keep trying forever
         timeout: 10000,
         transports: ['websocket', 'polling'],
         auth: {
@@ -58,35 +69,45 @@ class SocketManagerClass implements SocketManager {
       });
 
       this.socket.on('connect', () => {
-        console.log('Connected to signaling server');
+        console.log('🟢 CONNECTED - Socket ID:', this.socket?.id);
+        console.log('🟢 Transport:', this.socket?.io?.engine?.transport?.name);
         this.isConnected = true;
         resolve();
       });
 
       this.socket.on('disconnect', (reason) => {
-        console.log('Disconnected from signaling server:', reason);
+        console.log('🔴 DISCONNECT EVENT FIRED');
+        console.log('🔴 Reason:', reason);
+        console.log('🔴 Time:', new Date().toISOString());
         this.isConnected = false;
-        this.onDisconnected?.();
-
+        if (this.onDisconnected) {
+          this.onDisconnected();
+        }
         // Auto-reconnect unless manually disconnected
         if (reason !== 'io client disconnect') {
-          this.onReconnecting?.();
+          if (this.onReconnecting) {
+            this.onReconnecting();
+          }
         }
       });
 
-      this.socket.on('reconnect', (attemptNumber) => {
-        console.log('Reconnected to signaling server after', attemptNumber, 'attempts');
+      this.socket.io.on('reconnect_attempt', (attemptNumber) => {
+        console.log('🟡 RECONNECT ATTEMPT #' + attemptNumber);
+        if (this.onReconnecting) {
+          this.onReconnecting();
+        }
+      });
+
+      this.socket.io.on('reconnect', (attemptNumber) => {
+        console.log('🟢 RECONNECTED after ' + attemptNumber + ' attempts');
         this.isConnected = true;
-        this.onReconnected?.();
+        if (this.onReconnected) {
+          this.onReconnected();
+        }
       });
 
-      this.socket.on('reconnect_attempt', (attemptNumber) => {
-        console.log('Reconnection attempt', attemptNumber);
-        this.onReconnecting?.();
-      });
-
-      this.socket.on('reconnect_error', (error) => {
-        console.error('Reconnection error:', error);
+      this.socket.io.on('reconnect_error', (error) => {
+        console.log('🔴 RECONNECT ERROR:', error.message);
       });
 
       this.socket.on('reconnect_failed', () => {
@@ -196,9 +217,15 @@ class SocketManagerClass implements SocketManager {
 
   disconnect(): void {
     if (this.socket) {
+      this.socket.removeAllListeners();
       this.socket.disconnect();
       this.socket = null;
       this.isConnected = false;
+    }
+    // Clear search timeout
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = null;
     }
   }
 }

@@ -32,7 +32,10 @@ const io = new Server(httpServer, {
     origin: process.env.FRONTEND_URL || "http://localhost:3000",
     methods: ["GET", "POST"],
     credentials: true
-  }
+  },
+  // Aggressive heartbeat for fast disconnect detection
+  pingInterval: 2000,  // Send ping every 2 seconds
+  pingTimeout: 5000    // Wait 5 seconds for pong response before disconnect
 });
 
 // Simple queue for matching users
