@@ -110,19 +110,9 @@ export default function FilterDropdown({
     <div
       ref={dropdownRef}
       style={{
-        position: 'absolute',
-        bottom: 'calc(100% + 8px)',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: '420px',
-        maxWidth: '90vw',
-        background: 'var(--bg-secondary)',
-        border: '1px solid var(--border-primary)',
-        borderRadius: '16px',
-        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
-        padding: 'var(--space-lg)',
-        zIndex: 100,
-        animation: 'slideUp 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+        width: '100%',
+        padding: 'var(--space-md)',
+        animation: 'slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
       }}
     >
       {/* Preferred Countries */}
@@ -352,14 +342,14 @@ export default function FilterDropdown({
       </div>
 
       <style jsx>{`
-        @keyframes slideUp {
+        @keyframes slideDown {
           from {
             opacity: 0;
-            transform: translateX(-50%) translateY(8px);
+            maxHeight: 0;
           }
           to {
             opacity: 1;
-            transform: translateX(-50%) translateY(0);
+            maxHeight: 500px;
           }
         }
       `}</style>
