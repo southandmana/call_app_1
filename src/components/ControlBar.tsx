@@ -81,62 +81,29 @@ export default function ControlBar({
         borderRadius: '32px',
         background: 'var(--bg-secondary)',
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2)',
-        width: isIdle ? '90%' : 'auto',
-        maxWidth: isIdle ? '600px' : 'calc(100% - 80px)',
+        width: '336px',
         minHeight: '72px',
         overflow: 'visible',
         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
       }}>
-        {/* Idle Mode: Interest Input */}
+        {/* Idle Mode: Filter Button */}
         {isIdle && (
-          <div
-            ref={dropdownRef}
-            className="interest-input-container"
-            style={{
-              flex: 1,
-              maxWidth: '420px',
-              position: 'relative',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-            }}
-          >
-            <div
-              style={{
-                width: '100%',
-                padding: '12px 48px 12px 24px',
-                border: 'none',
-                background: 'transparent',
-                color: 'var(--text-primary)',
-                fontSize: '14px',
-                fontWeight: 500,
-                fontFamily: 'inherit',
-                outline: 'none',
-                textAlign: 'left',
-                lineHeight: 1.5,
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                pointerEvents: 'none'
-              }}
-            />
-
-            {/* Globe Icon Button */}
+          <div ref={dropdownRef} style={{ position: 'relative' }}>
             <button
               onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
               style={{
-                position: 'absolute',
-                right: '12px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                width: '32px',
-                height: '32px',
+                width: '48px',
+                height: '48px',
+                padding: 0,
+                borderRadius: '24px',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                background: isFilterDropdownOpen ? 'var(--accent)' : 'transparent',
+                color: isFilterDropdownOpen ? 'white' : '#b0b8c5',
+                cursor: 'pointer',
+                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                background: isFilterDropdownOpen ? 'var(--accent)' : 'transparent',
-                border: 'none',
-                borderRadius: '6px',
-                color: isFilterDropdownOpen ? 'white' : 'var(--text-tertiary)',
-                cursor: 'pointer',
-                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                zIndex: 10
+                justifyContent: 'center'
               }}
               onMouseEnter={(e) => {
                 if (!isFilterDropdownOpen) {
@@ -147,12 +114,12 @@ export default function ControlBar({
               onMouseLeave={(e) => {
                 if (!isFilterDropdownOpen) {
                   e.currentTarget.style.background = 'transparent';
-                  e.currentTarget.style.color = 'var(--text-tertiary)';
+                  e.currentTarget.style.color = '#b0b8c5';
                 }
               }}
               title="Filter by country"
             >
-              <svg style={{ width: '18px', height: '18px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </button>
