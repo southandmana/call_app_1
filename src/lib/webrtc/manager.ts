@@ -24,6 +24,7 @@ class WebRTCManagerClass implements WebRTCManager {
   private eventListeners: Map<string, Function[]> = new Map();
   private socketListenersSetup: boolean = false;
   private isManualHangup: boolean = false;
+  private searchStartTime: number | null = null;
   peer: Peer.Instance | null = null;
   localStream: MediaStream | null = null;
   remoteAudio: HTMLAudioElement | null = null;
@@ -43,6 +44,16 @@ class WebRTCManagerClass implements WebRTCManager {
 
     socketManager.onMatched = async (data) => {
       console.log('Matched with peer:', data);
+
+      // Calculate elapsed time since search started
+      const elapsed = this.searchStartTime ? Date.now() - this.searchStartTime : 0;
+      const minDelay = 1200; // 1.2 seconds minimum
+
+      // Wait remaining time if match found too quickly
+      if (elapsed < minDelay) {
+        await new Promise(resolve => setTimeout(resolve, minDelay - elapsed));
+      }
+
       // Only initialize peer if we're in a valid state (not idle)
       if (this.connectionState === 'idle') {
         console.log('Ignoring match - already returned to idle state');
@@ -195,6 +206,9 @@ class WebRTCManagerClass implements WebRTCManager {
   endCall(isManual: boolean = true): void {
     this.isManualHangup = isManual;
 
+    // Reset search start time
+    this.searchStartTime = null;
+
     // If ending call during search (no peer yet), leave the queue
     if (isManual && !this.peer && this.connectionState === 'connecting') {
       socketManager.leaveQueue();
@@ -269,6 +283,9 @@ class WebRTCManagerClass implements WebRTCManager {
       // Connect to signaling server
       await socketManager.connect();
 
+      // Record search start time for minimum delay
+      this.searchStartTime = Date.now();
+
       // Start searching for a match with filters
       socketManager.startCall(filters);
 
@@ -276,6 +293,7 @@ class WebRTCManagerClass implements WebRTCManager {
     } catch (error) {
       console.error('Failed to start call:', error);
       this.setState('idle');
+      this.searchStartTime = null;
       throw error;
     }
   }
