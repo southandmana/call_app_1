@@ -45,6 +45,7 @@ class SocketManagerClass implements SocketManager {
       // If socket exists but not connected, clean it up first
       if (this.socket) {
         this.socket.removeAllListeners();
+        this.socket.io.removeAllListeners();  // Clean up manager listeners too
         this.socket.disconnect();
         this.socket = null;
       }
@@ -62,6 +63,8 @@ class SocketManagerClass implements SocketManager {
         reconnectionDelayMax: 5000,     // Max 5 seconds between reconnect attempts
         reconnectionAttempts: Infinity, // Keep trying forever
         timeout: 10000,
+        pingTimeout: 5000,              // Client waits max 5s for ping from server before disconnect
+        pingInterval: 2000,             // Client expects ping every 2s from server
         transports: ['websocket', 'polling'],
         auth: {
           sessionId: sessionId
@@ -218,6 +221,7 @@ class SocketManagerClass implements SocketManager {
   disconnect(): void {
     if (this.socket) {
       this.socket.removeAllListeners();
+      this.socket.io.removeAllListeners();  // Clean up manager listeners too
       this.socket.disconnect();
       this.socket = null;
       this.isConnected = false;
