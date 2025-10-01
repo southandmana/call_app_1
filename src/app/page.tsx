@@ -390,8 +390,7 @@ export default function Home() {
           <>
             There are {displayedText}
             <span style={{
-              opacity: showHeadingCursor ? 1 : 0,
-              marginLeft: '2px'
+              opacity: showHeadingCursor ? 1 : 0
             }}>|</span>
           </>
         );
@@ -517,9 +516,7 @@ export default function Home() {
               color: 'var(--text-primary)',
               lineHeight: 1.1,
               minHeight: '105px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              textAlign: 'center',
               transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
             }}>
               {getStatusTitle()}
