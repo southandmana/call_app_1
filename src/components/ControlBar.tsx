@@ -59,8 +59,6 @@ export default function ControlBar({
     }
   };
 
-  if (!shouldShow) return null;
-
   return (
     <div style={{
       position: 'relative',
@@ -68,7 +66,8 @@ export default function ControlBar({
       width: '100%',
       zIndex: isFilterDropdownOpen ? 200 : 1
     }}>
-      <div className={`controls ${isIdle ? 'idle-mode' : 'connected-mode'} show`} style={{
+      {shouldShow && (
+        <div className={`controls ${isIdle ? 'idle-mode' : 'connected-mode'} show`} style={{
         position: 'absolute',
         left: '50%',
         top: 0,
@@ -300,7 +299,8 @@ export default function ControlBar({
             </button>
           </>
         )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
