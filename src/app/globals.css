@@ -30,29 +30,24 @@ body {
 .call-button-idle {
   background: var(--accent) !important;
   color: white !important;
-  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4) !important;
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
   animation: idle-pulse 3s ease-in-out infinite !important;
 }
 
 .call-button-idle:hover {
-  background: var(--accent-hover);
-  box-shadow: 0 16px 50px rgba(139, 92, 246, 0.6);
+  background: #9568f7 !important;
   animation: none !important;
-  transform: scale(1.05);
 }
 
 .call-button-idle:active {
-  transform: scale(0.98);
   box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
 }
 
 @keyframes idle-pulse {
   0%, 100% {
-    transform: scale(1);
     box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
   }
   50% {
-    transform: scale(1.02);
     box-shadow: 0 10px 35px rgba(139, 92, 246, 0.5);
   }
 }
@@ -94,7 +89,6 @@ body {
 }
 
 .call-button-connected:active {
-  transform: scale(0.98);
 }
 
 .call-button-disabled {
@@ -230,4 +224,33 @@ body {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
   }
+}
+
+/* Interest Tag Animations */
+@keyframes tagAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.interest-tag {
+  animation: tagAppear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Hover Effects - Glow Only */
+.control-item {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.control-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.add-friend-button:hover {
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
 }

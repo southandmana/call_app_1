@@ -1,5 +1,52 @@
 # Project Progress Log
 
+## Session: UI Redesign - Phase 3 (Oct 1, 2025)
+
+### ✅ Phase 3: Animations & Polish (COMPLETED)
+Final polish pass adding smooth animations and refined hover effects.
+
+**Animations Implemented:**
+1. **Interest Tag Appear Animation:**
+   - Scale + fade animation (0.8 → 1.0 scale)
+   - Bouncy easing curve for playful feel
+   - 300ms duration
+
+2. **Control Bar Slide-Up:**
+   - Already implemented from Phase 2
+   - Slides up from bottom with fade on page load
+   - 500ms duration with bounce easing
+
+3. **Hover Effects:**
+   - Call button: Subtle color shift on hover (no movement)
+   - Control buttons: Soft shadow glow on hover
+   - Add Friend button: Enhanced purple glow
+   - All buttons: Smooth transitions
+
+4. **Theme Toggle Animation:**
+   - Icon rotates 180° and scales to 0.9 on click
+   - Bouncy easing for satisfying feel
+   - 300ms duration
+
+**Refinements:**
+- Removed all lift/movement effects from call button per user preference
+- Tuned hover glow to be very subtle
+- Removed transform scale from pulse animation (shadow-only pulse)
+- All animations use consistent cubic-bezier easing
+
+**Files Modified:**
+- `src/app/globals.css` - Added animation keyframes and hover effects
+- `src/app/page.tsx` - Added interest-tag className
+- `src/components/ThemeToggle.tsx` - Added icon rotation animation
+
+**Testing Results:**
+- ✅ Interest tags appear with smooth scale animation
+- ✅ Control bar slides up on page load
+- ✅ Hover effects subtle and polished
+- ✅ Theme toggle rotates smoothly on click
+- ✅ No unwanted movement on call button
+
+---
+
 ## Session: UI Redesign - Phase 2 (Oct 1, 2025)
 
 ### ✅ Phase 2: ControlBar Component (COMPLETED)

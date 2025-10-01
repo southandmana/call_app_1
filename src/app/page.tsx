@@ -532,20 +532,24 @@ export default function Home() {
                 marginTop: 'var(--space-lg)'
               }}>
                 {userFilters.interests.map((interest, index) => (
-                  <div key={index} style={{
-                    background: 'var(--bg-tertiary)',
-                    border: '1px solid var(--border-secondary)',
-                    color: 'var(--text-secondary)',
-                    padding: '8px 16px',
-                    borderRadius: '16px',
-                    fontSize: '14px',
-                    fontWeight: 500,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    lineHeight: 1.4,
-                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-                  }}>
+                  <div
+                    key={index}
+                    className="interest-tag"
+                    style={{
+                      background: 'var(--bg-tertiary)',
+                      border: '1px solid var(--border-secondary)',
+                      color: 'var(--text-secondary)',
+                      padding: '8px 16px',
+                      borderRadius: '16px',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      lineHeight: 1.4,
+                      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                    }}
+                  >
                     {interest}
                   </div>
                 ))}
