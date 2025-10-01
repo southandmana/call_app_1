@@ -100,7 +100,12 @@ export default function ControlBar({
         }}>
         {/* Idle Mode: Filter Button */}
         {isIdle && (
-          <div ref={dropdownRef}>
+          <div ref={dropdownRef} style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '4px'
+          }}>
             <button
               onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
               style={{
@@ -108,9 +113,13 @@ export default function ControlBar({
                 height: '48px',
                 padding: 0,
                 borderRadius: '24px',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                background: isFilterDropdownOpen ? 'var(--accent)' : 'transparent',
-                color: isFilterDropdownOpen ? 'white' : '#b0b8c5',
+                border: isFilterDropdownOpen ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
+                background: isFilterDropdownOpen
+                  ? 'var(--text-primary)'
+                  : 'transparent',
+                color: isFilterDropdownOpen
+                  ? 'var(--bg-primary)'
+                  : '#b0b8c5',
                 cursor: 'pointer',
                 transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                 display: 'flex',
@@ -129,12 +138,21 @@ export default function ControlBar({
                   e.currentTarget.style.color = '#b0b8c5';
                 }
               }}
-              title="Filter by country"
+              title="Filters"
             >
-              <svg style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg style={{ width: '20px', height: '20px' }} fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
               </svg>
             </button>
+            <span style={{
+              fontSize: '11px',
+              fontWeight: 500,
+              color: 'var(--text-tertiary)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              Filters
+            </span>
           </div>
         )}
 
