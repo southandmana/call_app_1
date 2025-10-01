@@ -1,5 +1,55 @@
 # Project Progress Log
 
+## Session: UI Redesign - Phase 2 (Oct 1, 2025)
+
+### ✅ Phase 2: ControlBar Component (COMPLETED)
+Complete implementation of unified ControlBar with state-based UI switching.
+
+**Features Implemented:**
+1. **Idle State - Interest Input:**
+   - Animated typewriter placeholder cycling through example interests
+   - Blinking cursor animation (500ms interval)
+   - Character counter (0/20) appears on focus
+   - Purple gradient underline animation on focus
+   - Warning state at 18+ characters, error state at 20 characters
+   - Press Enter to add interest as tag
+   - Click outside to reset and resume animation
+
+2. **Connected State - Control Buttons:**
+   - Mute button with muted/unmuted visual states
+   - Skip button to move to next caller
+   - Add Friend button with purple accent
+   - Block button
+   - Report button
+   - All buttons have hover effects and proper styling
+
+**Technical Implementation:**
+- Created `src/components/ControlBar.tsx` with full state management
+- Separate useEffect hooks for cursor blinking and typewriter animation
+- Focus state tracking to pause animation when input is active
+- Character count tracking with real-time updates
+- CSS animations for purple gradient underline and counter visibility
+- Proper cleanup of event listeners and intervals
+
+**Files Modified:**
+- `src/components/ControlBar.tsx` (new) - Main component with all logic
+- `src/app/globals.css` - Added ControlBar styles (counter, underline, focus states)
+- `src/app/page.tsx` - Integrated ControlBar with handlers
+
+**Testing Results:**
+- ✅ Typewriter animation cycles smoothly through all messages
+- ✅ Blinking cursor visible and continuous
+- ✅ Focus state shows counter and purple underline
+- ✅ Character counter updates in real-time
+- ✅ Warning/error colors at character limits
+- ✅ Enter key adds interest and clears input
+- ✅ Blur resets input and resumes animation
+- ✅ Connected state shows all control buttons
+- ✅ Mute button toggles visual state correctly
+- ✅ All hover effects working
+
+---
+
 ## Session: UI Redesign - Phase 1 (Oct 1, 2025)
 
 ### ✅ Phase 1: Layout & Visual Structure (COMPLETED)

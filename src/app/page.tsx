@@ -9,6 +9,7 @@ import ErrorModal from '@/components/ErrorModal';
 import ErrorToast from '@/components/ErrorToast';
 import ErrorBanner from '@/components/ErrorBanner';
 import ThemeToggle from '@/components/ThemeToggle';
+import ControlBar from '@/components/ControlBar';
 import axios from 'axios';
 
 type CallState = 'idle' | 'searching' | 'connected' | 'no-users';
@@ -282,6 +283,33 @@ export default function Home() {
     console.log('Report user');
   };
 
+  const handleSkip = () => {
+    // Skip to next caller (ends current call)
+    if (webrtcManager) {
+      webrtcManager.endCall();
+    }
+    console.log('Skip to next caller');
+  };
+
+  const handleAddFriend = () => {
+    // TODO: Implement add friend functionality
+    console.log('Add friend');
+  };
+
+  const handleBlock = () => {
+    // TODO: Implement block functionality
+    console.log('Block user');
+  };
+
+  const handleAddInterest = (interest: string) => {
+    if (interest && !userFilters.interests.includes(interest)) {
+      setUserFilters({
+        ...userFilters,
+        interests: [...userFilters.interests, interest]
+      });
+    }
+  };
+
   const getCallButtonText = () => {
     if (callState === 'searching' && autoCallEnabled) {
       return 'Searching for next caller...';
@@ -538,7 +566,20 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Control Buttons - Temporarily hidden, will be moved to ControlBar in Phase 2 */}
+          {/* Control Bar */}
+          <ControlBar
+            callState={callState}
+            isMuted={isMuted}
+            onMute={handleMute}
+            onSkip={handleSkip}
+            onAddFriend={handleAddFriend}
+            onBlock={handleBlock}
+            onReport={handleReport}
+            userFilters={userFilters}
+            onAddInterest={handleAddInterest}
+          />
+
+          {/* Old control buttons removed - now in ControlBar */}
           <div className="flex flex-col items-center" style={{ gap: 'var(--space-xl)', display: 'none' }}>
             {/* Mute Button */}
             <div className="flex flex-col items-center">
