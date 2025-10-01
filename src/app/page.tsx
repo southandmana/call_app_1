@@ -388,10 +388,14 @@ export default function Home() {
       default: {
         return (
           <>
-            There are {displayedText}
+            <span style={{ fontSize: '42px', fontWeight: 400 }}>There are </span>
+            <span style={{ fontSize: '56px', fontWeight: 700 }}>{displayedText}</span>
             <span style={{
-              opacity: showHeadingCursor ? 1 : 0
+              opacity: showHeadingCursor ? 1 : 0,
+              fontSize: '56px',
+              fontWeight: 700
             }}>|</span>
+            <span style={{ fontSize: '42px', fontWeight: 400 }}> looking to date</span>
           </>
         );
       }
