@@ -367,9 +367,6 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="flex-1 flex items-center justify-center p-8">
-        {/* TEST: Big Red Circle */}
-        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-red-600 rounded-full z-50"></div>
-
         <div className="flex flex-col items-center space-y-8 max-w-xs">
           {/* Logo */}
           <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
