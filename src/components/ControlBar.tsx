@@ -33,7 +33,8 @@ export default function ControlBar({
 }: ControlBarProps) {
   const isIdle = callState === 'idle';
   const isConnected = callState === 'connected';
-  const shouldShow = isIdle || isConnected;
+  const isSearching = callState === 'searching';
+  const shouldShow = isIdle || isConnected || isSearching;
 
   const [charCount, setCharCount] = useState(0);
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
@@ -67,7 +68,7 @@ export default function ControlBar({
       zIndex: isFilterDropdownOpen ? 200 : 1
     }}>
       {shouldShow && (
-        <div className={`controls ${isIdle ? 'idle-mode' : 'connected-mode'} show`} style={{
+        <div className={`controls ${isIdle ? 'idle-mode' : isSearching ? 'searching-mode' : 'connected-mode'} show`} style={{
         position: 'absolute',
         left: '50%',
         top: 0,
@@ -132,6 +133,40 @@ export default function ControlBar({
               onFiltersChange={onFiltersChange}
               anchorRef={dropdownRef}
             />
+          </div>
+        )}
+
+        {/* Searching Mode: Loading Dots */}
+        {isSearching && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px'
+          }}>
+            <div style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: '#8b5cf6',
+              animation: 'dot-pulse 1.4s infinite ease-in-out both',
+              animationDelay: '-0.32s'
+            }} />
+            <div style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: '#8b5cf6',
+              animation: 'dot-pulse 1.4s infinite ease-in-out both',
+              animationDelay: '-0.16s'
+            }} />
+            <div style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: '#8b5cf6',
+              animation: 'dot-pulse 1.4s infinite ease-in-out both'
+            }} />
           </div>
         )}
 
@@ -270,4 +305,22 @@ export default function ControlBar({
       )}
     </div>
   );
+}
+
+// Add keyframes for dot pulse animation
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes dot-pulse {
+      0%, 80%, 100% {
+        opacity: 0.3;
+        transform: scale(0.8);
+      }
+      40% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  `;
+  document.head.appendChild(style);
 }
