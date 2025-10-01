@@ -1,5 +1,64 @@
 # Project Progress Log
 
+## Session: UI Redesign - Phase 1 (Oct 1, 2025)
+
+### ✅ Phase 1: Layout & Visual Structure (COMPLETED)
+Complete redesign of the UI to match HTML design file. All backend functionality preserved.
+
+**Visual Changes Implemented:**
+1. **Page Frame** - Added 24px padding around entire app for frame effect
+2. **Main Content Card** - Converted main area to bordered card with `bg-secondary`, border, and rounded corners
+3. **Header Redesign:**
+   - Changed logo from "AirTalk" to "Noodlie"
+   - Added navigation links (Home, Discover, Settings) with active state styling
+   - Reorganized online status display with purple dot indicator
+   - Added filters button as icon (moved from inline button)
+   - Maintained theme toggle functionality
+4. **Status Message System:**
+   - Added large status title (48px, bold) that changes with call state
+   - Added status subtitle (18px) with contextual messages
+   - Both have smooth transitions
+5. **Interest Tags Display:**
+   - Tags now display below status message in main area
+   - Shows user's selected interests from filters
+   - Styled with `bg-tertiary`, borders, and proper spacing
+6. **Call Button:**
+   - Resized from 128px to 120px (matching HTML design)
+   - Icon resized to 36px
+   - Maintained all state classes and animations
+7. **Cleanup:**
+   - Removed AirTalk logo circle
+   - Removed auto-call checkbox (will be moved to settings later)
+   - Removed call history button (will be moved to navigation)
+   - Removed ad placeholder
+   - Hidden mute/report buttons temporarily (moving to ControlBar in Phase 2)
+
+**Technical Details:**
+- All changes in `src/app/page.tsx`
+- Used CSS variables from `src/styles/theme.css`
+- Preserved all state management, WebRTC callbacks, and socket handlers
+- No backend logic modified
+- All existing functionality intact (filters, phone verification, error handling)
+
+**Files Modified:**
+- `src/app/page.tsx` - Main UI restructure
+
+**What Still Works:**
+- ✅ Theme toggle (light/dark mode)
+- ✅ Filters modal (click filter icon to add interests/countries)
+- ✅ Interest tags display
+- ✅ All error modals and toasts
+- ✅ Phone verification flow
+- ✅ WebRTC and socket connection logic
+
+**Next Phase (Phase 2):**
+- Create ControlBar component with interest input and control buttons
+- Idle state: Interest input field
+- Connected state: Mute, Skip, Add Friend, Block, Report buttons
+- Pill-shaped design with proper positioning
+
+---
+
 ## Session: Production Deployment Complete (Sept 30, 2025)
 
 ### ✅ Deployment Successfully Completed

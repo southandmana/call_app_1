@@ -8,6 +8,7 @@ import PhoneVerification from '@/components/PhoneVerification';
 import ErrorModal from '@/components/ErrorModal';
 import ErrorToast from '@/components/ErrorToast';
 import ErrorBanner from '@/components/ErrorBanner';
+import ThemeToggle from '@/components/ThemeToggle';
 import axios from 'axios';
 
 type CallState = 'idle' | 'searching' | 'connected' | 'no-users';
@@ -293,6 +294,24 @@ export default function Home() {
     }
   };
 
+  const getStatusTitle = () => {
+    switch (callState) {
+      case 'searching': return 'Finding you a match';
+      case 'connected': return 'Connected';
+      case 'no-users': return 'No one available';
+      default: return 'Ready to connect';
+    }
+  };
+
+  const getStatusSubtitle = () => {
+    switch (callState) {
+      case 'searching': return 'Looking for someone interesting...';
+      case 'connected': return 'You\'re talking with a stranger';
+      case 'no-users': return 'Try again in a moment or adjust your filters';
+      default: return 'Press the button below to start a voice call';
+    }
+  };
+
   const handleCancelSearch = () => {
     if (webrtcManager) {
       webrtcManager.endCall();
@@ -301,25 +320,26 @@ export default function Home() {
   };
 
   const getCallButtonClass = () => {
-    const baseClass = "w-24 h-24 rounded-full flex flex-col items-center justify-center text-white font-semibold transition-all duration-300";
+    const baseClass = "rounded-full flex items-center justify-center font-semibold transition-all duration-300 border-none cursor-pointer";
+    const sizeClass = "w-[120px] h-[120px]"; // 120px as per HTML design
 
     if (callState === 'connected') {
-      return `${baseClass} bg-red-500 hover:bg-red-600`;
+      return `${baseClass} ${sizeClass} call-button-connected`;
     }
 
     if (callState === 'searching') {
-      return `${baseClass} bg-green-500 animate-pulse`;
+      return `${baseClass} ${sizeClass} call-button-searching`;
     }
 
     if (callState === 'no-users') {
-      return `${baseClass} bg-gray-500`;
+      return `${baseClass} ${sizeClass} call-button-disabled`;
     }
 
-    return `${baseClass} bg-green-500 hover:bg-green-600 hover:scale-105 animate-[radiating_2s_ease-in-out_infinite]`;
+    return `${baseClass} ${sizeClass} call-button-idle`;
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg-primary)', padding: '0 24px 24px 24px' }}>
       {/* Error/Connection Banner */}
       {isReconnecting && (
         <ErrorBanner
@@ -337,40 +357,172 @@ export default function Home() {
       )}
 
       {/* Header */}
-      <header className="flex justify-between items-center p-4 bg-white shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-sm font-medium">Online</span>
+      <header className="flex justify-between items-center" style={{
+        background: 'var(--bg-primary)',
+        padding: 'var(--space-lg) var(--space-xl)',
+        gap: 'var(--space-xl)'
+      }}>
+        <div className="flex items-center" style={{ gap: 'var(--space-2xl)' }}>
+          {/* Logo */}
+          <div style={{
+            fontSize: '24px',
+            fontWeight: 700,
+            color: 'var(--text-primary)',
+            letterSpacing: '-0.02em',
+            lineHeight: 1
+          }}>
+            Noodlie
           </div>
-          <div className="flex items-center gap-1">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-            </svg>
-            <span className="text-sm">{onlineUsers}</span>
-          </div>
+
+          {/* Navigation */}
+          <nav className="flex items-center" style={{ gap: 'var(--space-xl)' }}>
+            <a href="#" style={{
+              color: 'var(--text-primary)',
+              textDecoration: 'none',
+              fontSize: '14px',
+              fontWeight: 500,
+              position: 'relative',
+              borderBottom: '2px solid var(--accent)',
+              paddingBottom: '4px'
+            }}>
+              Home
+            </a>
+            <a href="#" style={{
+              color: 'var(--text-tertiary)',
+              textDecoration: 'none',
+              fontSize: '14px',
+              fontWeight: 500,
+              transition: 'color 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+            }}>
+              Discover
+            </a>
+            <a href="#" style={{
+              color: 'var(--text-tertiary)',
+              textDecoration: 'none',
+              fontSize: '14px',
+              fontWeight: 500,
+              transition: 'color 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+            }}>
+              Settings
+            </a>
+          </nav>
         </div>
-        <button
-          onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-          className={`flex items-center gap-2 text-sm font-medium transition-colors ${
-            isFiltersOpen
-              ? 'text-green-600 bg-green-50'
-              : 'text-gray-700 hover:text-gray-900'
-          } px-3 py-2 rounded-lg`}
-        >
-          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
-          </svg>
-          Filters
-        </button>
+
+        <div className="flex items-center" style={{ gap: 'var(--space-lg)' }}>
+          {/* Online Status */}
+          <div className="flex items-center" style={{
+            gap: 'var(--space-sm)',
+            fontSize: '13px',
+            fontWeight: 500,
+            color: 'var(--text-tertiary)',
+            padding: 'var(--space-xs) var(--space-md)',
+            borderRadius: '12px',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            lineHeight: 1.4
+          }}>
+            <div style={{
+              width: '8px',
+              height: '8px',
+              background: '#8b5cf6',
+              borderRadius: '50%'
+            }}></div>
+            <span>{onlineUsers} online</span>
+          </div>
+
+          {/* Filters Button */}
+          <button
+            onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+            style={{
+              width: '36px',
+              height: '36px',
+              background: 'transparent',
+              border: '1px solid var(--border-primary)',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+              color: 'var(--text-secondary)'
+            }}
+          >
+            <svg style={{ width: '20px', height: '20px' }} fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
+            </svg>
+          </button>
+
+          <ThemeToggle />
+        </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center p-8">
-        <div className="flex flex-col items-center space-y-8 max-w-xs">
-          {/* Logo */}
-          <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
-            AirTalk
+      <main className="flex-1 flex items-center justify-center" style={{
+        background: 'var(--bg-secondary)',
+        border: '1px solid var(--border-primary)',
+        borderRadius: 'var(--space-lg)',
+        padding: 'var(--space-3xl)',
+        minHeight: 'calc(100vh - 64px)'
+      }}>
+        <div className="flex flex-col items-center max-w-2xl w-full" style={{ gap: 'var(--space-2xl)' }}>
+          {/* Status Message */}
+          <div className="text-center" style={{ maxWidth: '600px' }}>
+            <h1 style={{
+              fontSize: '48px',
+              fontWeight: 700,
+              letterSpacing: '-0.03em',
+              marginBottom: '16px',
+              color: 'var(--text-primary)',
+              lineHeight: 1.1,
+              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+            }}>
+              {getStatusTitle()}
+            </h1>
+            <p style={{
+              fontSize: '18px',
+              fontWeight: 500,
+              color: 'var(--text-tertiary)',
+              letterSpacing: '-0.01em',
+              lineHeight: 1.5,
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              minHeight: '48px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              {getStatusSubtitle()}
+            </p>
+
+            {/* Interest Tags */}
+            {userFilters.interests.length > 0 && (
+              <div style={{
+                display: 'flex',
+                gap: 'var(--space-sm)',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '48px',
+                marginTop: 'var(--space-lg)'
+              }}>
+                {userFilters.interests.map((interest, index) => (
+                  <div key={index} style={{
+                    background: 'var(--bg-tertiary)',
+                    border: '1px solid var(--border-secondary)',
+                    color: 'var(--text-secondary)',
+                    padding: '8px 16px',
+                    borderRadius: '16px',
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    lineHeight: 1.4,
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}>
+                    {interest}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Call Button */}
@@ -380,37 +532,24 @@ export default function Home() {
               className={getCallButtonClass()}
               disabled={callState === 'searching' || callState === 'no-users'}
             >
-              <svg className="w-8 h-8 mb-1" fill="currentColor" viewBox="0 0 20 20">
+              <svg style={{ width: '36px', height: '36px' }} fill="currentColor" viewBox="0 0 20 20">
                 <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
               </svg>
             </button>
-            <span className="text-sm font-medium mt-2 text-gray-700">{getCallButtonText()}</span>
-
-            {/* No users message */}
-            {callState === 'no-users' && (
-              <div className="mt-4 text-center">
-                <p className="text-sm text-gray-600 mb-3">No users available right now. Try adjusting your filters or wait a moment.</p>
-                <button
-                  onClick={handleCancelSearch}
-                  className="text-sm text-green-600 hover:text-green-700 font-medium underline"
-                >
-                  Try Again
-                </button>
-              </div>
-            )}
           </div>
 
-          {/* Control Buttons */}
-          <div className="flex flex-col items-center space-y-6">
+          {/* Control Buttons - Temporarily hidden, will be moved to ControlBar in Phase 2 */}
+          <div className="flex flex-col items-center" style={{ gap: 'var(--space-xl)', display: 'none' }}>
             {/* Mute Button */}
             <div className="flex flex-col items-center">
               <button
                 onClick={handleMute}
-                className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-200 ${
-                  isMuted
-                    ? 'bg-red-500 text-white'
-                    : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
-                }`}
+                className="w-16 h-16 rounded-full flex items-center justify-center transition-all duration-200"
+                style={{
+                  background: isMuted ? 'var(--error)' : 'var(--bg-tertiary)',
+                  color: isMuted ? 'white' : 'var(--text-secondary)',
+                  border: `1px solid ${isMuted ? 'var(--error)' : 'var(--border-primary)'}`
+                }}
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                   {isMuted ? (
@@ -420,7 +559,7 @@ export default function Home() {
                   )}
                 </svg>
               </button>
-              <span className="text-sm font-medium mt-2 text-gray-700">Mute</span>
+              <span className="text-sm font-medium mt-2" style={{ color: 'var(--text-tertiary)' }}>Mute</span>
             </div>
 
             {/* Report Button */}
@@ -428,53 +567,25 @@ export default function Home() {
               <button
                 onClick={handleReport}
                 disabled={callState !== 'connected'}
-                className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-200 ${
-                  callState === 'connected'
-                    ? 'bg-orange-500 hover:bg-orange-600 text-white'
-                    : 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
-                }`}
+                className="w-16 h-16 rounded-full flex items-center justify-center transition-all duration-200"
+                style={{
+                  background: callState === 'connected' ? 'var(--warning)' : 'var(--bg-tertiary)',
+                  color: callState === 'connected' ? 'white' : 'var(--text-muted)',
+                  border: `1px solid ${callState === 'connected' ? 'var(--warning)' : 'var(--border-primary)'}`,
+                  opacity: callState === 'connected' ? 1 : 0.5,
+                  cursor: callState === 'connected' ? 'pointer' : 'not-allowed'
+                }}
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
               </button>
-              <span className="text-sm font-medium mt-2 text-gray-700">Report</span>
+              <span className="text-sm font-medium mt-2" style={{ color: 'var(--text-tertiary)' }}>Report</span>
             </div>
           </div>
 
-          {/* Auto Call Checkbox */}
-          <div className="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              id="autoCall"
-              checked={autoCallEnabled}
-              onChange={(e) => setAutoCallEnabled(e.target.checked)}
-              className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
-            />
-            <label htmlFor="autoCall" className="text-sm text-gray-700">
-              Enable auto call
-            </label>
-          </div>
-
-          {/* Call History Button */}
-          <button className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-            </svg>
-            Call History
-          </button>
-
-          {/* Instruction Text */}
-          <p className="text-sm text-gray-600 text-center max-w-xs">
-            Tap the <span className="text-green-600 font-medium">call button</span> to call a new stranger
-          </p>
         </div>
       </main>
-
-      {/* Bottom Ad Placeholder */}
-      <div className="bg-gray-200 h-20 m-4 rounded-lg flex items-center justify-center text-gray-500 text-sm">
-        Advertisement Placeholder
-      </div>
 
       {/* Filters Menu */}
       <FiltersMenu
