@@ -392,15 +392,15 @@ export default function Home() {
       }}>
         <div className="flex items-center" style={{ gap: 'var(--space-2xl)' }}>
           {/* Logo */}
-          <div style={{
-            fontSize: '24px',
-            fontWeight: 700,
-            color: 'var(--text-primary)',
-            letterSpacing: '-0.02em',
-            lineHeight: 1
-          }}>
-            Noodlie
-          </div>
+          <img
+            src="/logo.svg"
+            alt="Logo"
+            className="logo"
+            style={{
+              height: '32px',
+              width: 'auto'
+            }}
+          />
 
           {/* Navigation */}
           <nav className="flex items-center" style={{ gap: 'var(--space-xl)' }}>

@@ -254,3 +254,12 @@ body {
 .add-friend-button:hover {
   box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
 }
+
+/* Logo Theme Styles */
+.logo {
+  filter: none; /* Black in light mode */
+}
+
+[data-theme="dark"] .logo {
+  filter: invert(1) brightness(0.9); /* White in dark mode */
+}
