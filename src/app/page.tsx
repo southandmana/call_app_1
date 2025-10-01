@@ -10,6 +10,7 @@ import ErrorToast from '@/components/ErrorToast';
 import ErrorBanner from '@/components/ErrorBanner';
 import ThemeToggle from '@/components/ThemeToggle';
 import ControlBar from '@/components/ControlBar';
+import AccountMenu from '@/components/AccountMenu';
 import axios from 'axios';
 
 type CallState = 'idle' | 'searching' | 'connected' | 'no-users';
@@ -20,6 +21,7 @@ export default function Home() {
   const [autoCallEnabled, setAutoCallEnabled] = useState(false);
   const [webrtcManager, setWebrtcManager] = useState<WebRTCManager | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState(0);
   const [showVerification, setShowVerification] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
@@ -53,6 +55,11 @@ export default function Home() {
   const [isDisconnected, setIsDisconnected] = useState(false);
   const [isReconnecting, setIsReconnecting] = useState(false);
 
+  // Typewriter animation for heading
+  const [displayedText, setDisplayedText] = useState(`${onlineUsers} people online looking to date`);
+  const [showHeadingCursor, setShowHeadingCursor] = useState(true);
+  const [isAnimating, setIsAnimating] = useState(false);
+
   // Use refs to access current values in callbacks
   const autoCallEnabledRef = useRef(autoCallEnabled);
   const userFiltersRef = useRef(userFilters);
@@ -65,6 +72,53 @@ export default function Home() {
   useEffect(() => {
     userFiltersRef.current = userFilters;
   }, [userFilters]);
+
+  // Blinking cursor for heading
+  useEffect(() => {
+    const cursorInterval = setInterval(() => {
+      setShowHeadingCursor(prev => !prev);
+    }, 500);
+    return () => clearInterval(cursorInterval);
+  }, []);
+
+  // Typewriter animation when onlineUsers changes
+  useEffect(() => {
+    if (callState !== 'idle') return;
+
+    const newText = `${onlineUsers} people online looking to date`;
+    const oldText = displayedText;
+
+    if (oldText === newText) return;
+
+    setIsAnimating(true);
+
+    // Delete old text (backwards)
+    let deleteIndex = oldText.length;
+    const deleteInterval = setInterval(() => {
+      if (deleteIndex > 0) {
+        deleteIndex--;
+        setDisplayedText(oldText.substring(0, deleteIndex));
+      } else {
+        clearInterval(deleteInterval);
+
+        // Type new text (forwards)
+        let typeIndex = 0;
+        const typeInterval = setInterval(() => {
+          if (typeIndex < newText.length) {
+            typeIndex++;
+            setDisplayedText(newText.substring(0, typeIndex));
+          } else {
+            clearInterval(typeInterval);
+            setIsAnimating(false);
+          }
+        }, 50);
+      }
+    }, 30);
+
+    return () => {
+      setIsAnimating(false);
+    };
+  }, [onlineUsers, callState]);
 
   // Check phone verification on mount
   useEffect(() => {
@@ -260,6 +314,10 @@ export default function Home() {
         console.error('Failed to start call:', error);
         setCallState('idle');
       }
+    } else if (callState === 'searching') {
+      // Cancel the search
+      webrtcManager.endCall(true);
+      // State will be updated by onStateChange callback
     } else if (callState === 'connected') {
       webrtcManager.endCall();
       // State will be updated by onStateChange callback
@@ -327,7 +385,17 @@ export default function Home() {
       case 'searching': return 'Finding you a match';
       case 'connected': return 'Connected';
       case 'no-users': return 'No one available';
-      default: return 'Ready to connect';
+      default: {
+        return (
+          <>
+            There are {displayedText}
+            <span style={{
+              opacity: showHeadingCursor ? 1 : 0,
+              marginLeft: '2px'
+            }}>|</span>
+          </>
+        );
+      }
     }
   };
 
@@ -390,7 +458,7 @@ export default function Home() {
         padding: 'var(--space-lg) var(--space-xl)',
         gap: 'var(--space-xl)'
       }}>
-        <div className="flex items-center" style={{ gap: 'var(--space-2xl)' }}>
+        <div className="flex items-center">
           {/* Logo */}
           <img
             src="/logo.svg"
@@ -401,65 +469,12 @@ export default function Home() {
               width: 'auto'
             }}
           />
-
-          {/* Navigation */}
-          <nav className="flex items-center" style={{ gap: 'var(--space-xl)' }}>
-            <a href="#" style={{
-              color: 'var(--text-primary)',
-              textDecoration: 'none',
-              fontSize: '14px',
-              fontWeight: 500,
-              position: 'relative',
-              borderBottom: '2px solid var(--accent)',
-              paddingBottom: '4px'
-            }}>
-              Home
-            </a>
-            <a href="#" style={{
-              color: 'var(--text-tertiary)',
-              textDecoration: 'none',
-              fontSize: '14px',
-              fontWeight: 500,
-              transition: 'color 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-            }}>
-              Discover
-            </a>
-            <a href="#" style={{
-              color: 'var(--text-tertiary)',
-              textDecoration: 'none',
-              fontSize: '14px',
-              fontWeight: 500,
-              transition: 'color 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-            }}>
-              Settings
-            </a>
-          </nav>
         </div>
 
         <div className="flex items-center" style={{ gap: 'var(--space-lg)' }}>
-          {/* Online Status */}
-          <div className="flex items-center" style={{
-            gap: 'var(--space-sm)',
-            fontSize: '13px',
-            fontWeight: 500,
-            color: 'var(--text-tertiary)',
-            padding: 'var(--space-xs) var(--space-md)',
-            borderRadius: '12px',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            lineHeight: 1.4
-          }}>
-            <div style={{
-              width: '8px',
-              height: '8px',
-              background: '#8b5cf6',
-              borderRadius: '50%'
-            }}></div>
-            <span>{onlineUsers} online</span>
-          </div>
-
-          {/* Filters Button */}
+          {/* Account Button */}
           <button
-            onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+            onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
             style={{
               width: '36px',
               height: '36px',
@@ -475,7 +490,7 @@ export default function Home() {
             }}
           >
             <svg style={{ width: '20px', height: '20px' }} fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
+              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
             </svg>
           </button>
 
@@ -493,7 +508,7 @@ export default function Home() {
       }}>
         <div className="flex flex-col items-center max-w-2xl w-full" style={{ gap: 'var(--space-2xl)' }}>
           {/* Status Message */}
-          <div className="text-center" style={{ maxWidth: '600px' }}>
+          <div className="text-center" style={{ maxWidth: '600px', minHeight: '180px' }}>
             <h1 style={{
               fontSize: '48px',
               fontWeight: 700,
@@ -501,6 +516,10 @@ export default function Home() {
               marginBottom: '16px',
               color: 'var(--text-primary)',
               lineHeight: 1.1,
+              minHeight: '105px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
             }}>
               {getStatusTitle()}
@@ -512,7 +531,7 @@ export default function Home() {
               letterSpacing: '-0.01em',
               lineHeight: 1.5,
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              minHeight: '48px',
+              minHeight: '54px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
@@ -562,12 +581,54 @@ export default function Home() {
             <button
               onClick={handleCallClick}
               className={getCallButtonClass()}
-              disabled={callState === 'searching' || callState === 'no-users'}
+              disabled={callState === 'no-users'}
+              style={{
+                position: 'relative',
+                ...(callState === 'searching' && {
+                  background: 'transparent',
+                  border: '4px solid rgba(139, 92, 246, 0.2)',
+                  boxShadow: 'none',
+                  cursor: 'pointer'
+                })
+              }}
             >
-              <svg style={{ width: '36px', height: '36px' }} fill="currentColor" viewBox="0 0 20 20">
-                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-              </svg>
+              <span style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                {callState === 'searching' ? (
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '28px', height: '28px' }}>
+                    <rect x="6" y="6" width="12" height="12" fill="#8b5cf6" rx="2"/>
+                  </svg>
+                ) : (
+                  <svg style={{ width: '36px', height: '36px' }} fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                  </svg>
+                )}
+              </span>
+
+              {/* Spinning ring when searching */}
+              {callState === 'searching' && (
+                <span style={{
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%',
+                  border: '4px solid transparent',
+                  borderTopColor: '#8b5cf6',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                  pointerEvents: 'none'
+                }} />
+              )}
             </button>
+
+            <style jsx>{`
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            `}</style>
           </div>
 
           {/* Control Bar */}
@@ -581,6 +642,7 @@ export default function Home() {
             onReport={handleReport}
             userFilters={userFilters}
             onAddInterest={handleAddInterest}
+            onFiltersChange={setUserFilters}
           />
 
           {/* Old control buttons removed - now in ControlBar */}
@@ -637,6 +699,19 @@ export default function Home() {
         isOpen={isFiltersOpen}
         onClose={() => setIsFiltersOpen(false)}
         onApplyFilters={handleApplyFilters}
+      />
+
+      {/* Account Menu */}
+      <AccountMenu
+        isOpen={isAccountMenuOpen}
+        onClose={() => setIsAccountMenuOpen(false)}
+        autoCallEnabled={autoCallEnabled}
+        onAutoCallToggle={() => setAutoCallEnabled(!autoCallEnabled)}
+        onSignOut={() => {
+          localStorage.removeItem('session_id');
+          setIsVerified(false);
+          setShowVerification(true);
+        }}
       />
 
       {/* Phone Verification Modal */}

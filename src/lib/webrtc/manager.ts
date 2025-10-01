@@ -43,6 +43,11 @@ class WebRTCManagerClass implements WebRTCManager {
 
     socketManager.onMatched = async (data) => {
       console.log('Matched with peer:', data);
+      // Only initialize peer if we're in a valid state (not idle)
+      if (this.connectionState === 'idle') {
+        console.log('Ignoring match - already returned to idle state');
+        return;
+      }
       try {
         await this.initializePeer(data.isInitiator);
         this.emit('callStarted');
@@ -59,7 +64,8 @@ class WebRTCManagerClass implements WebRTCManager {
 
     socketManager.onSignal = async (data) => {
       console.log('Received signal:', data);
-      if (this.peer) {
+      // Only handle signal if we have a peer and not in idle state
+      if (this.peer && this.connectionState !== 'idle') {
         try {
           await this.connectToPeer(data.signal);
         } catch (error) {
@@ -189,8 +195,13 @@ class WebRTCManagerClass implements WebRTCManager {
   endCall(isManual: boolean = true): void {
     this.isManualHangup = isManual;
 
-    // Notify signaling server only if manual hangup
-    if (isManual) {
+    // If ending call during search (no peer yet), leave the queue
+    if (isManual && !this.peer && this.connectionState === 'connecting') {
+      socketManager.leaveQueue();
+    }
+
+    // Notify signaling server only if manual hangup and peer exists
+    if (isManual && this.peer) {
       socketManager.endCall();
     }
 
