@@ -166,10 +166,12 @@ export default function Home() {
       // Show disconnect message in subtitle instead of toast
       setShowDisconnectedMessage(true);
       setCallState('idle');
+      setIsConfirmingHangup(false);
     });
 
     manager.on('callEnded', () => {
       setLocalStream(null);
+      setIsConfirmingHangup(false);
       // Auto-call logic: if enabled, always restart (regardless of who ended it)
       if (autoCallEnabledRef.current) {
         console.log('Auto-call enabled, restarting search in 2 seconds...');
@@ -383,6 +385,11 @@ export default function Home() {
   };
 
   const getStatusTitle = () => {
+    // Show confirmation message when confirming hangup
+    if (isConfirmingHangup && callState === 'connected') {
+      return 'Woah :O';
+    }
+
     // Show sad message if user was hung up on
     if (showDisconnectedMessage && callState === 'idle') {
       return 'Oh no :(';
@@ -397,6 +404,11 @@ export default function Home() {
   };
 
   const getStatusSubtitle = () => {
+    // Show confirmation message when confirming hangup
+    if (isConfirmingHangup && callState === 'connected') {
+      return 'Are you sure you want to skip this person? if you are, press the yellow button';
+    }
+
     // Show disconnect message if user was hung up on
     if (showDisconnectedMessage && callState === 'idle') {
       return 'Call disconnected. Your partner may have left or lost connection.';
@@ -598,7 +610,7 @@ export default function Home() {
             <p style={{
               fontSize: '18px',
               fontWeight: 500,
-              color: showDisconnectedMessage && callState === 'idle' ? '#ef4444' : 'var(--text-tertiary)',
+              color: isConfirmingHangup ? '#EAB308' : (showDisconnectedMessage && callState === 'idle' ? '#ef4444' : 'var(--text-tertiary)'),
               letterSpacing: '-0.01em',
               lineHeight: 1.5,
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
