@@ -236,6 +236,8 @@ export default function Home() {
     manager.onStateChange = (state) => {
       if (state === 'connecting') {
         setCallState('searching');
+        // Reset disconnect message when starting to search (prevents flicker)
+        setShowDisconnectedMessage(false);
       } else if (state === 'connected') {
         setCallState('connected');
       } else if (state === 'idle' || state === 'disconnected') {
@@ -320,8 +322,8 @@ export default function Home() {
 
     if (callState === 'idle') {
       try {
-        // Reset disconnect message when starting a new call
-        setShowDisconnectedMessage(false);
+        // Don't reset showDisconnectedMessage here - it will be reset when state changes to 'searching'
+        // This prevents flicker of the default idle message before 'searching' state is set
         await webrtcManager.startCall(userFilters);
         // State will be updated by onStateChange callback
       } catch (error) {
