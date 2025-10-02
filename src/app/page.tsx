@@ -56,11 +56,6 @@ export default function Home() {
   const [isReconnecting, setIsReconnecting] = useState(false);
   const [showDisconnectedMessage, setShowDisconnectedMessage] = useState(false);
 
-  // Typewriter animation for heading
-  const [displayedText, setDisplayedText] = useState(`${onlineUsers} people online`);
-  const [showHeadingCursor, setShowHeadingCursor] = useState(true);
-  const [isAnimating, setIsAnimating] = useState(false);
-
   // Use refs to access current values in callbacks
   const autoCallEnabledRef = useRef(autoCallEnabled);
   const userFiltersRef = useRef(userFilters);
@@ -74,53 +69,6 @@ export default function Home() {
   useEffect(() => {
     userFiltersRef.current = userFilters;
   }, [userFilters]);
-
-  // Blinking cursor for heading
-  useEffect(() => {
-    const cursorInterval = setInterval(() => {
-      setShowHeadingCursor(prev => !prev);
-    }, 500);
-    return () => clearInterval(cursorInterval);
-  }, []);
-
-  // Typewriter animation when onlineUsers changes
-  useEffect(() => {
-    if (callState !== 'idle') return;
-
-    const newText = `${onlineUsers} people online`;
-    const oldText = displayedText;
-
-    if (oldText === newText) return;
-
-    setIsAnimating(true);
-
-    // Delete old text (backwards)
-    let deleteIndex = oldText.length;
-    const deleteInterval = setInterval(() => {
-      if (deleteIndex > 0) {
-        deleteIndex--;
-        setDisplayedText(oldText.substring(0, deleteIndex));
-      } else {
-        clearInterval(deleteInterval);
-
-        // Type new text (forwards)
-        let typeIndex = 0;
-        const typeInterval = setInterval(() => {
-          if (typeIndex < newText.length) {
-            typeIndex++;
-            setDisplayedText(newText.substring(0, typeIndex));
-          } else {
-            clearInterval(typeInterval);
-            setIsAnimating(false);
-          }
-        }, 50);
-      }
-    }, 30);
-
-    return () => {
-      setIsAnimating(false);
-    };
-  }, [onlineUsers, callState]);
 
   // Check phone verification on mount
   useEffect(() => {
@@ -397,23 +345,16 @@ export default function Home() {
   };
 
   const getStatusTitle = () => {
+    // Show sad message if user was hung up on
+    if (showDisconnectedMessage && callState === 'idle') {
+      return 'Oh no :(';
+    }
+
     switch (callState) {
       case 'searching': return 'Finding you a match';
       case 'connected': return 'Connected';
       case 'no-users': return 'No one available';
-      default: {
-        return (
-          <>
-            {displayedText}
-            <span style={{
-              opacity: showHeadingCursor && isAnimating ? 1 : 0,
-              marginLeft: '2px',
-              transition: 'opacity 0.1s',
-              display: 'inline-block'
-            }}>|</span>
-          </>
-        );
-      }
+      default: return 'Welcome';
     }
   };
 
@@ -482,19 +423,50 @@ export default function Home() {
         gap: 'var(--space-xl)'
       }}>
         <div className="flex items-center">
-          {/* Logo */}
-          <img
-            src="/logo.svg"
-            alt="Logo"
-            className="logo"
+          {/* Placeholder Triangle Icon */}
+          <svg
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            fill="currentColor"
             style={{
-              height: '32px',
-              width: 'auto'
+              color: 'var(--text-secondary)',
+              transform: 'rotate(-90deg)'
             }}
-          />
+          >
+            <path d="M8 5v14l11-7z"/>
+          </svg>
         </div>
 
         <div className="flex items-center" style={{ gap: 'var(--space-lg)' }}>
+          {/* Online Users Count */}
+          <div style={{
+            fontSize: '14px',
+            fontWeight: 500,
+            color: 'var(--text-secondary)',
+            letterSpacing: '-0.01em',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}>
+            <span style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              background: '#10B981',
+              display: 'inline-block'
+            }}></span>
+            {onlineUsers} people online
+          </div>
+
+          {/* Vertical Divider */}
+          <div style={{
+            width: '1px',
+            height: '24px',
+            background: 'var(--border-primary)',
+            opacity: 0.5
+          }}></div>
+
           {/* Account Button */}
           <button
             onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
@@ -532,7 +504,7 @@ export default function Home() {
         <div className="flex flex-col items-center max-w-2xl w-full" style={{ gap: 'var(--space-2xl)' }}>
           {/* Status Message */}
           <div className="text-center" style={{ maxWidth: '600px', minHeight: '180px' }}>
-            <h1 style={{
+            <div style={{
               fontSize: '48px',
               fontWeight: 700,
               letterSpacing: '-0.03em',
@@ -541,10 +513,25 @@ export default function Home() {
               lineHeight: 1.1,
               minHeight: '105px',
               textAlign: 'center',
-              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}>
-              {getStatusTitle()}
-            </h1>
+              {callState === 'idle' && !showDisconnectedMessage ? (
+                <img
+                  src="/logo.svg"
+                  alt="CQPDUK"
+                  className="logo"
+                  style={{
+                    height: '52px',
+                    width: 'auto'
+                  }}
+                />
+              ) : (
+                getStatusTitle()
+              )}
+            </div>
             <p style={{
               fontSize: '18px',
               fontWeight: 500,
