@@ -124,183 +124,493 @@ export default function FiltersMenu({ isOpen, onClose, filters, onApplyFilters }
       {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 40
+          }}
           onClick={onClose}
         />
       )}
 
-      {/* Filters Menu */}
-      <div className={`fixed top-0 left-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
-        <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="flex justify-between items-center p-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-800">Filters</h2>
-            <button
-              onClick={onClose}
-              onMouseEnter={() => playSound('/hover.mp3', 0.3)}
-              className="p-2 rounded-full transition-colors"
-            >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </button>
+      {/* Filters Menu Panel */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        right: 0,
+        height: '100%',
+        width: '320px',
+        background: 'var(--bg-secondary)',
+        borderLeft: '1px solid var(--border-primary)',
+        boxShadow: '-4px 0 24px rgba(0, 0, 0, 0.15)',
+        zIndex: 50,
+        transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
+        transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
+        {/* Header */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: 'var(--space-lg)',
+          borderBottom: '1px solid var(--border-primary)'
+        }}>
+          <h2 style={{
+            fontSize: '20px',
+            fontWeight: 600,
+            color: 'var(--text-primary)'
+          }}>
+            Filters
+          </h2>
+          <button
+            onClick={onClose}
+            style={{
+              width: '36px',
+              height: '36px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'transparent',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              color: 'var(--text-secondary)',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+            }}
+            onMouseEnter={(e) => {
+              playSound('/hover.mp3', 0.3);
+              e.currentTarget.style.background = 'var(--bg-tertiary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+            }}
+          >
+            <svg style={{ width: '20px', height: '20px' }} fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Content */}
+        <div style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: 'var(--space-lg)'
+        }}>
+          {/* Interests Section */}
+          <div style={{ marginBottom: 'var(--space-xl)' }}>
+            <h3 style={{
+              fontSize: '16px',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              marginBottom: 'var(--space-md)'
+            }}>
+              Interests
+            </h3>
+            <input
+              type="text"
+              placeholder="Type an interest and press Enter"
+              value={interestInput}
+              onChange={(e) => setInterestInput(e.target.value)}
+              onKeyDown={handleInterestKeyDown}
+              style={{
+                width: '100%',
+                padding: 'var(--space-sm) var(--space-md)',
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-primary)',
+                borderRadius: '8px',
+                color: 'var(--text-primary)',
+                fontSize: '14px',
+                outline: 'none',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--accent)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-primary)';
+              }}
+            />
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 'var(--space-xs)',
+              marginTop: 'var(--space-md)'
+            }}>
+              {interests.map((interest, index) => (
+                <span
+                  key={index}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-xs)',
+                    padding: '6px 12px',
+                    background: 'var(--bg-tertiary)',
+                    border: '1px solid var(--border-secondary)',
+                    borderRadius: '16px',
+                    fontSize: '13px',
+                    color: 'var(--text-secondary)',
+                    fontWeight: 500
+                  }}
+                >
+                  {interest}
+                  <button
+                    onClick={() => removeInterest(interest)}
+                    onMouseEnter={() => playSound('/hover.mp3', 0.3)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      cursor: 'pointer',
+                      color: 'var(--text-tertiary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      transition: 'color 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      playSound('/hover.mp3', 0.3);
+                      e.currentTarget.style.color = 'var(--error)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = 'var(--text-tertiary)';
+                    }}
+                  >
+                    <svg style={{ width: '12px', height: '12px' }} fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </span>
+              ))}
+            </div>
           </div>
 
-          {/* Content */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-6">
-            {/* Interests Section */}
-            <div>
-              <h3 className="text-lg font-medium text-gray-800 mb-3">Interests</h3>
+          {/* Preferred Countries Section */}
+          <div style={{ marginBottom: 'var(--space-xl)' }}>
+            <h3 style={{
+              fontSize: '16px',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              marginBottom: 'var(--space-md)'
+            }}>
+              Preferred Countries
+            </h3>
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 'var(--space-xs)',
+              marginBottom: 'var(--space-md)'
+            }}>
+              {preferredCountries.map((country) => (
+                <span
+                  key={country.code}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-xs)',
+                    padding: '6px 12px',
+                    background: 'var(--bg-tertiary)',
+                    border: '1px solid var(--border-secondary)',
+                    borderRadius: '16px',
+                    fontSize: '13px',
+                    color: 'var(--text-secondary)',
+                    fontWeight: 500
+                  }}
+                >
+                  <span>{country.flag}</span>
+                  {country.name}
+                  <button
+                    onClick={() => removePreferredCountry(country.code)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      cursor: 'pointer',
+                      color: 'var(--text-tertiary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      transition: 'color 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      playSound('/hover.mp3', 0.3);
+                      e.currentTarget.style.color = 'var(--error)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = 'var(--text-tertiary)';
+                    }}
+                  >
+                    <svg style={{ width: '12px', height: '12px' }} fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </span>
+              ))}
+            </div>
+            <div style={{ position: 'relative' }} ref={preferredInputRef}>
               <input
                 type="text"
-                placeholder="Type an interest and press Enter"
-                value={interestInput}
-                onChange={(e) => setInterestInput(e.target.value)}
-                onKeyDown={handleInterestKeyDown}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+                placeholder="Search countries..."
+                value={preferredSearch}
+                onChange={(e) => {
+                  setPreferredSearch(e.target.value);
+                  setShowPreferredDropdown(true);
+                }}
+                onFocus={() => setShowPreferredDropdown(true)}
+                disabled={preferredCountries.length >= 3}
+                style={{
+                  width: '100%',
+                  padding: 'var(--space-sm) var(--space-md)',
+                  background: preferredCountries.length >= 3 ? 'var(--bg-tertiary)' : 'var(--bg-tertiary)',
+                  border: '1px solid var(--border-primary)',
+                  borderRadius: '8px',
+                  color: 'var(--text-primary)',
+                  fontSize: '14px',
+                  outline: 'none',
+                  opacity: preferredCountries.length >= 3 ? 0.5 : 1,
+                  cursor: preferredCountries.length >= 3 ? 'not-allowed' : 'text',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
+                onFocus={(e) => {
+                  if (preferredCountries.length < 3) {
+                    e.currentTarget.style.borderColor = 'var(--accent)';
+                  }
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-primary)';
+                }}
               />
-              <div className="flex flex-wrap gap-2 mt-3">
-                {interests.map((interest, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
-                  >
-                    {interest}
+              {showPreferredDropdown && preferredCountries.length < 3 && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  right: 0,
+                  marginTop: '4px',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-primary)',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                  maxHeight: '200px',
+                  overflowY: 'auto',
+                  zIndex: 10
+                }}>
+                  {getFilteredCountries(preferredSearch, preferredCountries, nonPreferredCountries).map((country) => (
                     <button
-                      onClick={() => removeInterest(interest)}
-                      onMouseEnter={() => playSound('/hover.mp3', 0.3)}
-                      className="rounded-full p-0.5"
+                      key={country.code}
+                      onClick={() => addPreferredCountry(country)}
+                      style={{
+                        width: '100%',
+                        padding: 'var(--space-sm) var(--space-md)',
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--text-primary)',
+                        fontSize: '14px',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 'var(--space-sm)',
+                        transition: 'background 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        playSound('/hover.mp3', 0.3);
+                        e.currentTarget.style.background = 'var(--bg-tertiary)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                      }}
                     >
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
+                      <span>{country.flag}</span>
+                      {country.name}
                     </button>
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Preferred Countries Section */}
-            <div>
-              <h3 className="text-lg font-medium text-gray-800 mb-3">Preferred Countries</h3>
-              <div className="flex flex-wrap gap-2 mb-3">
-                {preferredCountries.map((country) => (
-                  <span
-                    key={country.code}
-                    className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                  >
-                    <span className="text-base">{country.flag}</span>
-                    {country.name}
-                    <button
-                      onClick={() => removePreferredCountry(country.code)}
-                      onMouseEnter={() => playSound('/hover.mp3', 0.3)}
-                      className="rounded-full p-0.5"
-                    >
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                    </button>
-                  </span>
-                ))}
-              </div>
-              <div className="relative" ref={preferredInputRef}>
-                <input
-                  type="text"
-                  placeholder="Type name"
-                  value={preferredSearch}
-                  onChange={(e) => {
-                    setPreferredSearch(e.target.value);
-                    setShowPreferredDropdown(true);
-                  }}
-                  onFocus={() => setShowPreferredDropdown(true)}
-                  disabled={preferredCountries.length >= 3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none disabled:bg-gray-100"
-                />
-                {showPreferredDropdown && preferredCountries.length < 3 && (
-                  <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto z-10">
-                    {getFilteredCountries(preferredSearch, preferredCountries, nonPreferredCountries).map((country) => (
-                      <button
-                        key={country.code}
-                        onClick={() => addPreferredCountry(country)}
-                        onMouseEnter={() => playSound('/hover.mp3', 0.3)}
-                        className="w-full px-3 py-2 text-left flex items-center gap-2"
-                      >
-                        <span className="text-base">{country.flag}</span>
-                        {country.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Non-Preferred Countries Section */}
-            <div>
-              <h3 className="text-lg font-medium text-gray-800 mb-3">Non-Preferred Countries</h3>
-              <div className="flex flex-wrap gap-2 mb-3">
-                {nonPreferredCountries.map((country) => (
-                  <span
-                    key={country.code}
-                    className="inline-flex items-center gap-2 px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm"
-                  >
-                    <span className="text-base">{country.flag}</span>
-                    {country.name}
-                    <button
-                      onClick={() => removeNonPreferredCountry(country.code)}
-                      onMouseEnter={() => playSound('/hover.mp3', 0.3)}
-                      className="rounded-full p-0.5"
-                    >
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                    </button>
-                  </span>
-                ))}
-              </div>
-              <div className="relative" ref={nonPreferredInputRef}>
-                <input
-                  type="text"
-                  placeholder="Type name"
-                  value={nonPreferredSearch}
-                  onChange={(e) => {
-                    setNonPreferredSearch(e.target.value);
-                    setShowNonPreferredDropdown(true);
-                  }}
-                  onFocus={() => setShowNonPreferredDropdown(true)}
-                  disabled={nonPreferredCountries.length >= 3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none disabled:bg-gray-100"
-                />
-                {showNonPreferredDropdown && nonPreferredCountries.length < 3 && (
-                  <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto z-10">
-                    {getFilteredCountries(nonPreferredSearch, nonPreferredCountries, preferredCountries).map((country) => (
-                      <button
-                        key={country.code}
-                        onClick={() => addNonPreferredCountry(country)}
-                        onMouseEnter={() => playSound('/hover.mp3', 0.3)}
-                        className="w-full px-3 py-2 text-left flex items-center gap-2"
-                      >
-                        <span className="text-base">{country.flag}</span>
-                        {country.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Apply Button */}
-          <div className="p-4 border-t border-gray-200">
-            <button
-              onClick={handleApply}
-              onMouseEnter={() => playSound('/hover.mp3', 0.3)}
-              className="w-full bg-red-500 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
-            >
-              Apply Filters
-            </button>
+          {/* Non-Preferred Countries Section */}
+          <div>
+            <h3 style={{
+              fontSize: '16px',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              marginBottom: 'var(--space-md)'
+            }}>
+              Non-Preferred Countries
+            </h3>
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 'var(--space-xs)',
+              marginBottom: 'var(--space-md)'
+            }}>
+              {nonPreferredCountries.map((country) => (
+                <span
+                  key={country.code}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-xs)',
+                    padding: '6px 12px',
+                    background: 'var(--bg-tertiary)',
+                    border: '1px solid var(--border-secondary)',
+                    borderRadius: '16px',
+                    fontSize: '13px',
+                    color: 'var(--text-secondary)',
+                    fontWeight: 500
+                  }}
+                >
+                  <span>{country.flag}</span>
+                  {country.name}
+                  <button
+                    onClick={() => removeNonPreferredCountry(country.code)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      cursor: 'pointer',
+                      color: 'var(--text-tertiary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      transition: 'color 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      playSound('/hover.mp3', 0.3);
+                      e.currentTarget.style.color = 'var(--error)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = 'var(--text-tertiary)';
+                    }}
+                  >
+                    <svg style={{ width: '12px', height: '12px' }} fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </span>
+              ))}
+            </div>
+            <div style={{ position: 'relative' }} ref={nonPreferredInputRef}>
+              <input
+                type="text"
+                placeholder="Search countries..."
+                value={nonPreferredSearch}
+                onChange={(e) => {
+                  setNonPreferredSearch(e.target.value);
+                  setShowNonPreferredDropdown(true);
+                }}
+                onFocus={() => setShowNonPreferredDropdown(true)}
+                disabled={nonPreferredCountries.length >= 3}
+                style={{
+                  width: '100%',
+                  padding: 'var(--space-sm) var(--space-md)',
+                  background: nonPreferredCountries.length >= 3 ? 'var(--bg-tertiary)' : 'var(--bg-tertiary)',
+                  border: '1px solid var(--border-primary)',
+                  borderRadius: '8px',
+                  color: 'var(--text-primary)',
+                  fontSize: '14px',
+                  outline: 'none',
+                  opacity: nonPreferredCountries.length >= 3 ? 0.5 : 1,
+                  cursor: nonPreferredCountries.length >= 3 ? 'not-allowed' : 'text',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
+                onFocus={(e) => {
+                  if (nonPreferredCountries.length < 3) {
+                    e.currentTarget.style.borderColor = 'var(--accent)';
+                  }
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-primary)';
+                }}
+              />
+              {showNonPreferredDropdown && nonPreferredCountries.length < 3 && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  right: 0,
+                  marginTop: '4px',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-primary)',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                  maxHeight: '200px',
+                  overflowY: 'auto',
+                  zIndex: 10
+                }}>
+                  {getFilteredCountries(nonPreferredSearch, nonPreferredCountries, preferredCountries).map((country) => (
+                    <button
+                      key={country.code}
+                      onClick={() => addNonPreferredCountry(country)}
+                      style={{
+                        width: '100%',
+                        padding: 'var(--space-sm) var(--space-md)',
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--text-primary)',
+                        fontSize: '14px',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 'var(--space-sm)',
+                        transition: 'background 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        playSound('/hover.mp3', 0.3);
+                        e.currentTarget.style.background = 'var(--bg-tertiary)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      <span>{country.flag}</span>
+                      {country.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
+        </div>
+
+        {/* Apply Button */}
+        <div style={{
+          padding: 'var(--space-lg)',
+          borderTop: '1px solid var(--border-primary)'
+        }}>
+          <button
+            onClick={handleApply}
+            style={{
+              width: '100%',
+              padding: 'var(--space-md)',
+              background: 'var(--accent)',
+              border: 'none',
+              borderRadius: '8px',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 'var(--space-sm)'
+            }}
+            onMouseEnter={(e) => {
+              playSound('/hover.mp3', 0.3);
+              e.currentTarget.style.opacity = '0.9';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = '1';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            Apply Filters
+          </button>
         </div>
       </div>
     </>
