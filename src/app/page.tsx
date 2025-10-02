@@ -54,6 +54,7 @@ export default function Home() {
   });
   const [isDisconnected, setIsDisconnected] = useState(false);
   const [isReconnecting, setIsReconnecting] = useState(false);
+  const [showDisconnectedMessage, setShowDisconnectedMessage] = useState(false);
 
   // Typewriter animation for heading
   const [displayedText, setDisplayedText] = useState(`${onlineUsers} people online`);
@@ -207,11 +208,8 @@ export default function Home() {
     });
 
     manager.on('connectionDropped', () => {
-      setToastMessage({
-        isVisible: true,
-        message: 'Call disconnected. Your partner may have left or lost connection.',
-        type: 'error',
-      });
+      // Show disconnect message in subtitle instead of toast
+      setShowDisconnectedMessage(true);
       setCallState('idle');
     });
 
@@ -322,6 +320,8 @@ export default function Home() {
 
     if (callState === 'idle') {
       try {
+        // Reset disconnect message when starting a new call
+        setShowDisconnectedMessage(false);
         await webrtcManager.startCall(userFilters);
         // State will be updated by onStateChange callback
       } catch (error) {
@@ -416,6 +416,11 @@ export default function Home() {
   };
 
   const getStatusSubtitle = () => {
+    // Show disconnect message if user was hung up on
+    if (showDisconnectedMessage && callState === 'idle') {
+      return 'Call disconnected. Your partner may have left or lost connection.';
+    }
+
     switch (callState) {
       case 'searching': return 'Looking for someone interesting...';
       case 'connected': return 'You\'re talking with a stranger';
@@ -541,7 +546,7 @@ export default function Home() {
             <p style={{
               fontSize: '18px',
               fontWeight: 500,
-              color: 'var(--text-tertiary)',
+              color: showDisconnectedMessage && callState === 'idle' ? '#ef4444' : 'var(--text-tertiary)',
               letterSpacing: '-0.01em',
               lineHeight: 1.5,
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -616,7 +621,16 @@ export default function Home() {
                     <rect x="6" y="6" width="12" height="12" fill="#8b5cf6" rx="2"/>
                   </svg>
                 ) : (
-                  <svg style={{ width: '36px', height: '36px' }} fill="currentColor" viewBox="0 0 20 20">
+                  <svg
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      transform: callState === 'connected' ? 'rotate(135deg)' : 'none',
+                      transition: 'transform 0.3s ease'
+                    }}
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
                     <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                   </svg>
                 )}
