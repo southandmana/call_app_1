@@ -1,10 +1,13 @@
 # AirTalk - Project Summary for UI/UX Work
 
 **Date:** September 30, 2025 (Updated: October 2, 2025)
-**Current Commit:** `f776a17` - "docs: update deployment completion status"
+**Current Commit:** `87333c7` - "ui: add custom character logo and adjust center logo size"
 **Status:** ✅ Fully deployed and operational
 
-> **📝 UPDATE (Oct 2, 2025):** Major UI redesign completed on Oct 1, 2025 (Phases 1-3). This guide reflects the pre-redesign architecture. Backend/WebRTC documentation below is still accurate, but UI components and layout have been significantly updated. See PROGRESS.md for UI redesign details.
+> **📝 UPDATE (Oct 2, 2025):**
+> - Major UI redesign completed on Oct 1, 2025 (Phases 1-3)
+> - Container transparency refinements completed on Oct 2, 2025 (minimalist design)
+> - This guide reflects the pre-redesign architecture. Backend/WebRTC documentation below is still accurate, but UI components and layout have been significantly updated. See PROGRESS.md for complete UI redesign details.
 
 ---
 
@@ -223,8 +226,9 @@ All components in `src/components/` are safe to modify:
 
 **Layout:**
 - Clean, centered single-page design
-- White header with online count and filters button
-- Light gray background
+- Transparent main container (no visible card/border)
+- Transparent button containers (minimalist floating design)
+- Unified background appearance
 - Centered content: Logo → Call Button → Controls → Footer buttons
 
 **Color Scheme:**

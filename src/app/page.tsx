@@ -492,9 +492,9 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="flex-1 flex items-center justify-center" style={{
-        background: 'var(--bg-secondary)',
-        border: '1px solid var(--border-primary)',
-        borderRadius: 'var(--space-lg)',
+        background: 'transparent',
+        border: 'none',
+        borderRadius: '0',
         padding: 'var(--space-3xl)',
         minHeight: 'calc(100vh - 64px)'
       }}>

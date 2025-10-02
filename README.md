@@ -104,6 +104,8 @@ src/
 - 🔓 Phone verification: Bypassed for testing (NEXT_PUBLIC_BYPASS_PHONE_VERIFICATION=true)
 
 **Recent Updates:**
+- ✅ UI refinements: Minimalist transparent container design (Oct 2, 2025)
+- ✅ Major UI redesign: New layout, ControlBar, animations (Oct 1, 2025)
 - ✅ Critical bug fixes: End Call button and call restart issues resolved (Oct 2, 2025)
 - ✅ Safari Socket.io connection issue resolved (Sept 30, 2025)
 - ✅ Cross-browser testing completed successfully
