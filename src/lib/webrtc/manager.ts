@@ -204,7 +204,9 @@ class WebRTCManagerClass implements WebRTCManager {
     }
 
     try {
-      this.setState('connecting');
+      // Don't set state to 'connecting' here - it's already set from onWaiting callback
+      // Setting it here causes flicker: connected → connecting → connected
+      // The peer 'connect' event will set state to 'connected' when ready
       this.peer.signal(signalData);
     } catch (error) {
       console.error('Failed to connect to peer:', error);
