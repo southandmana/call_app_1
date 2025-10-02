@@ -423,19 +423,16 @@ export default function Home() {
         gap: 'var(--space-xl)'
       }}>
         <div className="flex items-center">
-          {/* Placeholder Triangle Icon */}
-          <svg
-            width="32"
-            height="32"
-            viewBox="0 0 24 24"
-            fill="currentColor"
+          {/* Icon Logo */}
+          <img
+            src="/icon-logo.svg"
+            alt="Logo"
+            className="logo"
             style={{
-              color: 'var(--text-secondary)',
-              transform: 'rotate(-90deg)'
+              height: '32px',
+              width: 'auto'
             }}
-          >
-            <path d="M8 5v14l11-7z"/>
-          </svg>
+          />
         </div>
 
         <div className="flex items-center" style={{ gap: 'var(--space-lg)' }}>
@@ -524,7 +521,7 @@ export default function Home() {
                   alt="CQPDUK"
                   className="logo"
                   style={{
-                    height: '52px',
+                    height: '60px',
                     width: 'auto'
                   }}
                 />
