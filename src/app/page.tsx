@@ -492,23 +492,34 @@ export default function Home() {
 
         <div className="flex items-center" style={{ gap: 'var(--space-lg)' }}>
           {/* Online Users Count */}
-          <div style={{
-            fontSize: '14px',
-            fontWeight: 500,
-            color: 'var(--text-secondary)',
-            letterSpacing: '-0.01em',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px'
-          }}>
+          <div
+            style={{
+              height: '36px',
+              padding: '0 12px',
+              background: 'var(--bg-tertiary)',
+              border: '1px solid var(--border-primary)',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '14px',
+              fontWeight: 500,
+              color: 'var(--text-secondary)',
+              letterSpacing: '-0.01em'
+            }}
+            aria-label={`${onlineUsers} users online`}
+          >
             <span style={{
               width: '6px',
               height: '6px',
               borderRadius: '50%',
               background: '#10B981',
-              display: 'inline-block'
+              flexShrink: 0
             }}></span>
-            {onlineUsers} people online
+            {onlineUsers}
+            <svg style={{ width: '20px', height: '20px', flexShrink: 0 }} fill="currentColor" viewBox="0 0 20 20">
+              <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+            </svg>
           </div>
 
           {/* Vertical Divider */}
@@ -527,7 +538,7 @@ export default function Home() {
               height: '36px',
               background: 'transparent',
               border: '1px solid var(--border-primary)',
-              borderRadius: '8px',
+              borderRadius: '50%',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -549,7 +560,7 @@ export default function Home() {
               height: '36px',
               background: 'transparent',
               border: '1px solid var(--border-primary)',
-              borderRadius: '8px',
+              borderRadius: '50%',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',

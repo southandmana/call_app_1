@@ -104,6 +104,7 @@ src/
 - 🔓 Phone verification: Bypassed for testing (NEXT_PUBLIC_BYPASS_PHONE_VERIFICATION=true)
 
 **Recent Updates:**
+- ✅ Header redesign: Online counter with user icon in filled rectangle, circular navigation buttons (Oct 3, 2025)
 - ✅ UI refinements: Minimalist transparent container design (Oct 2, 2025)
 - ✅ Major UI redesign: New layout, ControlBar, animations (Oct 1, 2025)
 - ✅ Critical bug fixes: End Call button and call restart issues resolved (Oct 2, 2025)

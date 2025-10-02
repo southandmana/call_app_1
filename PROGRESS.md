@@ -1,5 +1,59 @@
 # Project Progress Log
 
+## Session: Header Redesign - Online Counter & Circular Buttons (Oct 3, 2025)
+
+### ✅ Header Navigation Polish (COMPLETED)
+Redesigned online user counter and converted navigation buttons to circular shape for modern, clean aesthetic.
+
+**Changes Made:**
+1. **Online User Counter Redesign:**
+   - Replaced "X people online" text with icon-based design
+   - Added user group icon (two people silhouette)
+   - Wrapped in rectangular container with filled background
+   - Background: `var(--bg-tertiary)` - adapts to light/dark themes
+   - Border: `1px solid var(--border-primary)`
+   - Height: 36px to match adjacent buttons
+   - Border radius: 8px (rectangular, distinct from circular buttons)
+   - Added `aria-label` for accessibility
+   - Padding: `0 12px` for number width variance
+   - Layout: Green dot + number + user icon
+   - File: `src/app/page.tsx` (lines 495-523)
+
+2. **Navigation Buttons Made Circular:**
+   - Filter button: `borderRadius: '8px'` → `'50%'` (page.tsx:541)
+   - Account button: `borderRadius: '8px'` → `'50%'` (page.tsx:563)
+   - Theme toggle: `border-radius: 8px` → `50%` (ThemeToggle.tsx:56)
+
+**Design Rationale:**
+- Shape contrast creates visual hierarchy:
+  - Rectangle (counter) = Status/Information display
+  - Circles (buttons) = Interactive actions
+- Follows Facebook's proven UI pattern (circular action buttons)
+- Counter's filled background distinguishes it from transparent buttons
+- Maintains flat design aesthetic throughout
+
+**Technical Details:**
+- 100% CSS-only changes - zero functional impact
+- Theme-aware via CSS variables (auto-adapts to light/dark mode)
+- Icon uses standard 20px × 20px size (consistent with other icons)
+- SVG inline with `currentColor` for theme compatibility
+- All button sizes remain 36px × 36px
+
+**Files Modified:**
+- `src/app/page.tsx` - Counter redesign + filter/account button radius
+- `src/components/ThemeToggle.tsx` - Theme button radius
+
+**Testing Results:**
+- ✅ Counter displays correctly with icon and number
+- ✅ Layout aligns perfectly with circular buttons
+- ✅ Theme switching works (light/dark modes)
+- ✅ Number width adapts (1, 12, 123 tested)
+- ✅ All buttons remain functional
+- ✅ Visual hierarchy clear (rectangle vs circles)
+- ✅ Accessibility maintained with aria-label
+
+---
+
 ## Session: UI Refinement - Container Transparency (Oct 2, 2025)
 
 ### ✅ Minimalist Design - Transparent Containers (COMPLETED)
