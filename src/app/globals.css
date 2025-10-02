@@ -33,7 +33,6 @@ body {
 }
 
 .call-button-idle:hover {
-  background: #9568f7 !important;
 }
 
 .call-button-idle:active {
@@ -68,7 +67,6 @@ body {
 }
 
 .call-button-connected:hover {
-  background: #f0f0f0 !important;
 }
 
 [data-theme="light"] .call-button-connected {
@@ -77,10 +75,17 @@ body {
 }
 
 [data-theme="light"] .call-button-connected:hover {
-  background: #1a1a1a !important;
 }
 
 .call-button-connected:active {
+}
+
+.call-button-confirming {
+  background: #EAB308 !important;
+  color: black !important;
+}
+
+.call-button-confirming:hover {
 }
 
 .call-button-disabled {
@@ -170,9 +175,6 @@ body {
 }
 
 .control-item:hover {
-  border-color: rgba(255, 255, 255, 0.35);
-  background: rgba(255, 255, 255, 0.05);
-  color: #d1d5db;
 }
 
 .control-item:active {
@@ -185,9 +187,6 @@ body {
 }
 
 [data-theme="light"] .control-item:hover {
-  border-color: var(--border-primary);
-  background: var(--bg-tertiary);
-  color: var(--text-secondary);
 }
 
 .controls.show {

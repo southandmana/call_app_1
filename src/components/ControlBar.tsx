@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { UserFilters } from './FiltersMenu';
 import FilterDropdown from './FilterDropdown';
+import { playSound } from '@/lib/audio';
 
 type CallState = 'idle' | 'searching' | 'connected' | 'no-users';
 
@@ -108,6 +109,7 @@ export default function ControlBar({
           }}>
             <button
               onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
+              onMouseEnter={() => playSound('/hover.mp3', 0.3)}
               style={{
                 width: '48px',
                 height: '48px',
@@ -198,6 +200,7 @@ export default function ControlBar({
             {/* Mute Button */}
             <button
               onClick={onMute}
+              onMouseEnter={() => playSound('/hover.mp3', 0.3)}
               className={`control-item mute-button ${isMuted ? 'muted' : ''}`}
               style={{
                 width: '48px',
@@ -224,33 +227,10 @@ export default function ControlBar({
               </svg>
             </button>
 
-            {/* Skip Button */}
-            <button
-              onClick={onSkip}
-              className="control-item skip-button"
-              style={{
-                width: '48px',
-                height: '48px',
-                padding: 0,
-                borderRadius: '24px',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                background: 'transparent',
-                color: '#b0b8c5',
-                cursor: 'pointer',
-                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <svg style={{ width: '20px', height: '20px' }} fill="currentColor" viewBox="0 0 20 20">
-                <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798l-5.445-3.63z" />
-              </svg>
-            </button>
-
             {/* Add Friend Button */}
             <button
               onClick={onAddFriend}
+              onMouseEnter={() => playSound('/hover.mp3', 0.3)}
               className="control-item add-friend-button"
               style={{
                 width: '48px',
@@ -273,34 +253,10 @@ export default function ControlBar({
               </svg>
             </button>
 
-            {/* Block Button */}
-            <button
-              onClick={onBlock}
-              className="control-item block-button"
-              style={{
-                width: '48px',
-                height: '48px',
-                padding: 0,
-                borderRadius: '24px',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                background: 'transparent',
-                color: '#b0b8c5',
-                cursor: 'pointer',
-                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-              title="Block"
-            >
-              <svg style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-              </svg>
-            </button>
-
             {/* Report Button */}
             <button
               onClick={onReport}
+              onMouseEnter={() => playSound('/hover.mp3', 0.3)}
               className="control-item report-button-control"
               style={{
                 width: '48px',

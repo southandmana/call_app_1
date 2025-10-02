@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { playSound } from '@/lib/audio';
 
 interface AccountMenuProps {
   isOpen: boolean;
@@ -184,6 +185,7 @@ export default function AccountMenu({
               transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
             }}
             onMouseEnter={(e) => {
+              playSound('/hover.mp3', 0.3);
               e.currentTarget.style.background = 'var(--bg-tertiary)';
             }}
             onMouseLeave={(e) => {
@@ -271,6 +273,7 @@ export default function AccountMenu({
                   textAlign: 'left'
                 }}
                 onMouseEnter={(e) => {
+                  playSound('/hover.mp3', 0.3);
                   e.currentTarget.style.background = 'var(--bg-tertiary)';
                   e.currentTarget.style.borderColor = 'var(--border-secondary)';
                 }}
@@ -337,6 +340,7 @@ export default function AccountMenu({
               gap: 'var(--space-sm)'
             }}
             onMouseEnter={(e) => {
+              playSound('/hover.mp3', 0.3);
               e.currentTarget.style.opacity = '0.9';
               e.currentTarget.style.transform = 'translateY(-1px)';
             }}

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { countries, Country } from '@/lib/countries';
 import { UserFilters } from './FiltersMenu';
+import { playSound } from '@/lib/audio';
 
 interface FilterDropdownProps {
   isOpen: boolean;
@@ -145,6 +146,7 @@ export default function FilterDropdown({
               <span>{country.name}</span>
               <button
                 onClick={() => removePreferredCountry(country.code)}
+                onMouseEnter={() => playSound('/hover.mp3', 0.3)}
                 style={{
                   background: 'none',
                   border: 'none',
@@ -216,7 +218,10 @@ export default function FilterDropdown({
                     gap: 'var(--space-sm)',
                     transition: 'background 0.15s'
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-primary)'}
+                  onMouseEnter={(e) => {
+                    playSound('/hover.mp3', 0.3);
+                    e.currentTarget.style.background = 'var(--bg-primary)';
+                  }}
                   onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                 >
                   <span>{country.flag}</span>
@@ -258,6 +263,7 @@ export default function FilterDropdown({
               <span>{country.name}</span>
               <button
                 onClick={() => removeNonPreferredCountry(country.code)}
+                onMouseEnter={() => playSound('/hover.mp3', 0.3)}
                 style={{
                   background: 'none',
                   border: 'none',
@@ -329,7 +335,10 @@ export default function FilterDropdown({
                     gap: 'var(--space-sm)',
                     transition: 'background 0.15s'
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-primary)'}
+                  onMouseEnter={(e) => {
+                    playSound('/hover.mp3', 0.3);
+                    e.currentTarget.style.background = 'var(--bg-primary)';
+                  }}
                   onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                 >
                   <span>{country.flag}</span>

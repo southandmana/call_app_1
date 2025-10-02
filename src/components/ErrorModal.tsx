@@ -115,7 +115,7 @@ export default function ErrorModal({
           {onRetry && (
             <button
               onClick={onRetry}
-              className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+              className="flex-1 bg-green-500 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
             >
               Try Again
             </button>
@@ -124,7 +124,7 @@ export default function ErrorModal({
             onClick={onClose}
             className={`${
               onRetry ? 'flex-1' : 'w-full'
-            } bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-4 rounded-lg transition-colors`}
+            } bg-gray-200 text-gray-800 font-semibold py-3 px-4 rounded-lg transition-colors`}
           >
             {type === 'mic-permission' ? 'Close' : 'Cancel'}
           </button>

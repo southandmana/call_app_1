@@ -109,7 +109,7 @@ export default function PhoneVerification({ onVerificationSuccess }: PhoneVerifi
             <button
               onClick={handleSendCode}
               disabled={loading || !phoneNumber}
-              className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+              className="w-full bg-green-500 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
               {loading ? 'Sending...' : 'Send Code'}
             </button>
@@ -128,7 +128,7 @@ export default function PhoneVerification({ onVerificationSuccess }: PhoneVerifi
             <button
               onClick={handleVerifyCode}
               disabled={loading || code.length !== 6}
-              className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed mb-4"
+              className="w-full bg-green-500 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed mb-4"
             >
               {loading ? 'Verifying...' : 'Verify'}
             </button>
@@ -137,7 +137,7 @@ export default function PhoneVerification({ onVerificationSuccess }: PhoneVerifi
               {canResend ? (
                 <button
                   onClick={handleResendCode}
-                  className="text-green-600 hover:text-green-700 font-medium"
+                  className="text-green-600 font-medium"
                   disabled={loading}
                 >
                   Resend Code
@@ -155,7 +155,7 @@ export default function PhoneVerification({ onVerificationSuccess }: PhoneVerifi
                 setCode('');
                 setError('');
               }}
-              className="w-full mt-4 text-gray-600 hover:text-gray-800 font-medium"
+              className="w-full mt-4 text-gray-600 font-medium"
             >
               Change Phone Number
             </button>

@@ -12,6 +12,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import ControlBar from '@/components/ControlBar';
 import AccountMenu from '@/components/AccountMenu';
 import VoiceActivityIndicator from '@/components/VoiceActivityIndicator';
+import { playSound, playLoopingSound } from '@/lib/audio';
 import axios from 'axios';
 
 type CallState = 'idle' | 'searching' | 'connected' | 'no-users';
@@ -32,6 +33,7 @@ export default function Home() {
     nonPreferredCountries: []
   });
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+  const [isConfirmingHangup, setIsConfirmingHangup] = useState(false);
 
   // Error states
   const [errorModal, setErrorModal] = useState<{
@@ -62,6 +64,7 @@ export default function Home() {
   const autoCallEnabledRef = useRef(autoCallEnabled);
   const userFiltersRef = useRef(userFilters);
   const webrtcManagerRef = useRef<WebRTCManager | null>(null);
+  const ringingAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // Keep refs in sync with state
   useEffect(() => {
@@ -135,6 +138,7 @@ export default function Home() {
     manager.on('callStarted', () => {
       setCallState('connected');
       setLocalStream(manager.getLocalStream());
+      playSound('/call-connect.mp3', 0.5);
     });
 
     manager.on('error', (data: { type: string; error: Error }) => {
@@ -190,16 +194,35 @@ export default function Home() {
         setCallState('searching');
         // Reset disconnect message when starting to search (prevents flicker)
         setShowDisconnectedMessage(false);
+        // Start ringing sound
+        if (!ringingAudioRef.current) {
+          ringingAudioRef.current = playLoopingSound('/ringing.mp3', 0.3);
+        }
       } else if (state === 'connected') {
         setCallState('connected');
+        // Stop ringing sound
+        if (ringingAudioRef.current) {
+          ringingAudioRef.current.pause();
+          ringingAudioRef.current = null;
+        }
       } else if (state === 'idle' || state === 'disconnected') {
         setCallState('idle');
+        // Stop ringing sound
+        if (ringingAudioRef.current) {
+          ringingAudioRef.current.pause();
+          ringingAudioRef.current = null;
+        }
       }
     };
 
     return () => {
       manager.disconnect();
       webrtcManagerRef.current = null;
+      // Stop ringing sound on cleanup
+      if (ringingAudioRef.current) {
+        ringingAudioRef.current.pause();
+        ringingAudioRef.current = null;
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -249,6 +272,11 @@ export default function Home() {
         socketManager.onSearchTimeout = () => {
           console.log('Search timeout - no users available');
           setCallState('no-users');
+          // Stop ringing sound
+          if (ringingAudioRef.current) {
+            ringingAudioRef.current.pause();
+            ringingAudioRef.current = null;
+          }
         };
       } catch (error) {
         console.error('Failed to connect socket for user count:', error);
@@ -287,8 +315,16 @@ export default function Home() {
       webrtcManager.endCall(true);
       // State will be updated by onStateChange callback
     } else if (callState === 'connected') {
-      webrtcManager.endCall();
-      // State will be updated by onStateChange callback
+      if (!isConfirmingHangup) {
+        // First click: Enter confirmation state
+        playSound('/hangup-warning.mp3', 0.5);
+        setIsConfirmingHangup(true);
+      } else {
+        // Second click: Actually end the call
+        setIsConfirmingHangup(false);
+        webrtcManager.endCall();
+        // State will be updated by onStateChange callback
+      }
     }
   };
 
@@ -300,6 +336,12 @@ export default function Home() {
   const handleMute = () => {
     if (webrtcManager) {
       webrtcManager.toggleMute();
+      // Play sound based on current state (before toggle)
+      if (isMuted) {
+        playSound('/mute-off.mp3', 0.5);
+      } else {
+        playSound('/mute-on.mp3', 0.5);
+      }
       setIsMuted(!isMuted);
     }
   };
@@ -387,6 +429,10 @@ export default function Home() {
     const baseClass = "rounded-full flex items-center justify-center font-semibold transition-all duration-300 border-none cursor-pointer";
     const sizeClass = "w-[120px] h-[120px]"; // 120px as per HTML design
 
+    if (callState === 'connected' && isConfirmingHangup) {
+      return `${baseClass} ${sizeClass} call-button-confirming`;
+    }
+
     if (callState === 'connected') {
       return `${baseClass} ${sizeClass} call-button-connected`;
     }
@@ -471,6 +517,7 @@ export default function Home() {
           {/* Account Button */}
           <button
             onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
+            onMouseEnter={() => playSound('/hover.mp3', 0.3)}
             style={{
               width: '36px',
               height: '36px',
@@ -590,6 +637,7 @@ export default function Home() {
             <VoiceActivityIndicator audioStream={localStream}>
               <button
                 onClick={handleCallClick}
+                onMouseEnter={() => playSound('/hover.mp3', 0.3)}
                 className={getCallButtonClass()}
                 disabled={callState === 'no-users'}
                 style={{
@@ -610,6 +658,18 @@ export default function Home() {
                 {callState === 'searching' ? (
                   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '28px', height: '28px' }}>
                     <rect x="6" y="6" width="12" height="12" fill="#8b5cf6" rx="2"/>
+                  </svg>
+                ) : callState === 'connected' && isConfirmingHangup ? (
+                  <svg
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      color: 'white'
+                    }}
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798l-5.445-3.63z" />
                   </svg>
                 ) : (
                   <svg

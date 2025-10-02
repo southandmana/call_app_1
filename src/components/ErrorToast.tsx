@@ -86,7 +86,7 @@ export default function ErrorToast({
         <p className="text-sm font-medium flex-1">{message}</p>
         <button
           onClick={onClose}
-          className="flex-shrink-0 text-white hover:text-gray-200 transition-colors"
+          className="flex-shrink-0 text-white transition-colors"
         >
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path
