@@ -106,7 +106,6 @@ export default function ControlBar({
             {/* Mute Button */}
             <button
               onClick={onMute}
-              onMouseEnter={() => playSound('/hover.mp3', 0.3)}
               className={`control-item mute-button ${isMuted ? 'muted' : ''}`}
               style={{
                 width: '48px',
@@ -136,7 +135,6 @@ export default function ControlBar({
             {/* Add Friend Button */}
             <button
               onClick={onAddFriend}
-              onMouseEnter={() => playSound('/hover.mp3', 0.3)}
               className="control-item add-friend-button"
               style={{
                 width: '48px',
@@ -162,7 +160,6 @@ export default function ControlBar({
             {/* Report Button */}
             <button
               onClick={onReport}
-              onMouseEnter={() => playSound('/hover.mp3', 0.3)}
               className="control-item report-button-control"
               style={{
                 width: '48px',

@@ -259,7 +259,6 @@ export default function FiltersMenu({ isOpen, onClose, filters, onApplyFilters }
                   {interest}
                   <button
                     onClick={() => removeInterest(interest)}
-                    onMouseEnter={() => playSound('/hover.mp3', 0.3)}
                     style={{
                       background: 'none',
                       border: 'none',

@@ -147,7 +147,6 @@ export default function FilterDropdown({
               <span>{country.name}</span>
               <button
                 onClick={() => removePreferredCountry(country.code)}
-                onMouseEnter={() => playSound('/hover.mp3', 0.3)}
                 style={{
                   background: 'none',
                   border: 'none',
@@ -264,7 +263,6 @@ export default function FilterDropdown({
               <span>{country.name}</span>
               <button
                 onClick={() => removeNonPreferredCountry(country.code)}
-                onMouseEnter={() => playSound('/hover.mp3', 0.3)}
                 style={{
                   background: 'none',
                   border: 'none',

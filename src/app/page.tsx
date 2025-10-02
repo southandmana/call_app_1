@@ -522,7 +522,6 @@ export default function Home() {
           {/* Filter Button */}
           <button
             onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-            onMouseEnter={() => playSound('/hover.mp3', 0.3)}
             style={{
               width: '36px',
               height: '36px',
@@ -545,7 +544,6 @@ export default function Home() {
           {/* Account Button */}
           <button
             onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
-            onMouseEnter={() => playSound('/hover.mp3', 0.3)}
             style={{
               width: '36px',
               height: '36px',
@@ -665,7 +663,6 @@ export default function Home() {
             <VoiceActivityIndicator audioStream={localStream}>
               <button
                 onClick={handleCallClick}
-                onMouseEnter={() => playSound('/hover.mp3', 0.3)}
                 className={getCallButtonClass()}
                 disabled={callState === 'no-users'}
                 style={{

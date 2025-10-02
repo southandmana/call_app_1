@@ -25,7 +25,6 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      onMouseEnter={() => playSound('/hover.mp3', 0.3)}
       className="menu-button"
       aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
     >
