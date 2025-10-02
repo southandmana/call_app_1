@@ -1,0 +1,57 @@
+# Dependencies (will be reinstalled during build)
+node_modules
+
+# Next.js build output (not needed for socket server)
+.next
+out
+.turbo
+
+# Build artifacts
+*.tsbuildinfo
+dist
+build
+
+# Git
+.git
+.gitignore
+
+# Documentation (not needed at runtime)
+*.md
+DEPLOYMENT.md
+LAUNCH_PLAN.md
+PROGRESS.md
+TODO.md
+UI_UX_GUIDE.md
+README.md
+
+# Environment files (set via Railway dashboard)
+.env*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Testing
+coverage
+.nyc_output
+
+# Vercel (not needed on Railway)
+.vercel
+
+# Misc
+.eslintcache
