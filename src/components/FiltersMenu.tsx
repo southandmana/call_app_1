@@ -13,10 +13,11 @@ export interface UserFilters {
 interface FiltersMenuProps {
   isOpen: boolean;
   onClose: () => void;
+  filters?: UserFilters;
   onApplyFilters?: (filters: UserFilters) => void;
 }
 
-export default function FiltersMenu({ isOpen, onClose, onApplyFilters }: FiltersMenuProps) {
+export default function FiltersMenu({ isOpen, onClose, filters, onApplyFilters }: FiltersMenuProps) {
   const [interests, setInterests] = useState<string[]>([]);
   const [interestInput, setInterestInput] = useState('');
   const [preferredCountries, setPreferredCountries] = useState<Country[]>([]);
@@ -28,6 +29,21 @@ export default function FiltersMenu({ isOpen, onClose, onApplyFilters }: Filters
 
   const preferredInputRef = useRef<HTMLInputElement>(null);
   const nonPreferredInputRef = useRef<HTMLInputElement>(null);
+
+  // Initialize from filters prop
+  useEffect(() => {
+    if (filters) {
+      setInterests(filters.interests || []);
+      const preferred = filters.preferredCountries
+        .map(code => countries.find(c => c.code === code))
+        .filter((c): c is Country => c !== undefined);
+      const nonPreferred = filters.nonPreferredCountries
+        .map(code => countries.find(c => c.code === code))
+        .filter((c): c is Country => c !== undefined);
+      setPreferredCountries(preferred);
+      setNonPreferredCountries(nonPreferred);
+    }
+  }, [filters]);
 
   // Handle interest input
   const handleInterestKeyDown = (e: React.KeyboardEvent) => {

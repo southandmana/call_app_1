@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { UserFilters } from './FiltersMenu';
-import FilterDropdown from './FilterDropdown';
 import { playSound } from '@/lib/audio';
 
 type CallState = 'idle' | 'searching' | 'connected' | 'no-users';
@@ -15,9 +13,6 @@ interface ControlBarProps {
   onAddFriend: () => void;
   onBlock: () => void;
   onReport: () => void;
-  userFilters: UserFilters;
-  onAddInterest: (interest: string) => void;
-  onFiltersChange: (filters: UserFilters) => void;
 }
 
 export default function ControlBar({
@@ -28,46 +23,18 @@ export default function ControlBar({
   onAddFriend,
   onBlock,
   onReport,
-  onAddInterest,
-  userFilters,
-  onFiltersChange,
 }: ControlBarProps) {
   const isIdle = callState === 'idle';
   const isConnected = callState === 'connected';
   const isSearching = callState === 'searching';
   const shouldShow = isIdle || isConnected || isSearching;
 
-  const [charCount, setCharCount] = useState(0);
-  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const handleInterestKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-      onAddInterest(e.currentTarget.value.trim());
-      e.currentTarget.value = '';
-      setCharCount(0);
-    }
-  };
-
-  const handleInterestChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCharCount(e.target.value.length);
-  };
-
-  const handleInterestBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    if (e.target.value.trim() === '') {
-      e.target.value = '';
-      setCharCount(0);
-    }
-  };
-
   return (
     <div style={{
       position: 'relative',
-      height: isFilterDropdownOpen ? 'auto' : '72px',
+      height: '72px',
       width: '100%',
-      zIndex: isFilterDropdownOpen ? 200 : 1,
-      transition: 'height 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+      zIndex: 1
     }}>
       {shouldShow && (
         <div className={`controls ${isIdle ? 'idle-mode' : isSearching ? 'searching-mode' : 'connected-mode'} show`} style={{
@@ -99,67 +66,6 @@ export default function ControlBar({
           minHeight: '72px',
           flexShrink: 0
         }}>
-        {/* Idle Mode: Filter Button */}
-        {isIdle && (
-          <div ref={dropdownRef} style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '4px'
-          }}>
-            <button
-              onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
-              onMouseEnter={() => playSound('/hover.mp3', 0.3)}
-              style={{
-                width: '48px',
-                height: '48px',
-                padding: 0,
-                borderRadius: '24px',
-                border: isFilterDropdownOpen ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
-                background: isFilterDropdownOpen
-                  ? 'var(--text-primary)'
-                  : 'transparent',
-                color: isFilterDropdownOpen
-                  ? 'var(--bg-primary)'
-                  : '#b0b8c5',
-                cursor: 'pointer',
-                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-              onMouseEnter={(e) => {
-                if (!isFilterDropdownOpen) {
-                  e.currentTarget.style.background = 'var(--bg-tertiary)';
-                  e.currentTarget.style.color = 'var(--text-secondary)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isFilterDropdownOpen) {
-                  e.currentTarget.style.background = 'transparent';
-                  e.currentTarget.style.color = '#b0b8c5';
-                }
-              }}
-              title="Filters"
-            >
-              <svg style={{ width: '20px', height: '20px' }} fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
-              </svg>
-            </button>
-            {isFilterDropdownOpen && (
-              <span style={{
-                fontSize: '11px',
-                fontWeight: 500,
-                color: 'var(--text-tertiary)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
-                Filters
-              </span>
-            )}
-          </div>
-        )}
-
         {/* Searching Mode: Loading Dots */}
         {isSearching && (
           <div style={{
@@ -280,22 +186,6 @@ export default function ControlBar({
           </>
         )}
         </div>
-
-        {/* Filter Panel Extension */}
-        {isFilterDropdownOpen && (
-          <div style={{
-            width: '100%',
-            padding: '0 16px 16px 16px'
-          }}>
-            <FilterDropdown
-              isOpen={isFilterDropdownOpen}
-              onClose={() => setIsFilterDropdownOpen(false)}
-              filters={userFilters}
-              onFiltersChange={onFiltersChange}
-              anchorRef={dropdownRef}
-            />
-          </div>
-        )}
         </div>
       )}
     </div>

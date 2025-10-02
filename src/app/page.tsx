@@ -370,15 +370,6 @@ export default function Home() {
     console.log('Block user');
   };
 
-  const handleAddInterest = (interest: string) => {
-    if (interest && !userFilters.interests.includes(interest)) {
-      setUserFilters({
-        ...userFilters,
-        interests: [...userFilters.interests, interest]
-      });
-    }
-  };
-
   const getCallButtonText = () => {
     if (callState === 'searching' && autoCallEnabled) {
       return 'Searching for next caller...';
@@ -514,6 +505,29 @@ export default function Home() {
             background: 'var(--border-primary)',
             opacity: 0.5
           }}></div>
+
+          {/* Filter Button */}
+          <button
+            onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+            onMouseEnter={() => playSound('/hover.mp3', 0.3)}
+            style={{
+              width: '36px',
+              height: '36px',
+              background: 'transparent',
+              border: '1px solid var(--border-primary)',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+              color: 'var(--text-secondary)'
+            }}
+          >
+            <svg style={{ width: '20px', height: '20px' }} fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
+            </svg>
+          </button>
 
           {/* Account Button */}
           <button
@@ -721,9 +735,6 @@ export default function Home() {
             onAddFriend={handleAddFriend}
             onBlock={handleBlock}
             onReport={handleReport}
-            userFilters={userFilters}
-            onAddInterest={handleAddInterest}
-            onFiltersChange={setUserFilters}
           />
 
           {/* Old control buttons removed - now in ControlBar */}
@@ -779,6 +790,7 @@ export default function Home() {
       <FiltersMenu
         isOpen={isFiltersOpen}
         onClose={() => setIsFiltersOpen(false)}
+        filters={userFilters}
         onApplyFilters={handleApplyFilters}
       />
 
