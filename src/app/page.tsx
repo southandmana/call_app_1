@@ -56,7 +56,7 @@ export default function Home() {
   const [isReconnecting, setIsReconnecting] = useState(false);
 
   // Typewriter animation for heading
-  const [displayedText, setDisplayedText] = useState(`${onlineUsers} people online looking to date`);
+  const [displayedText, setDisplayedText] = useState(`${onlineUsers} people online`);
   const [showHeadingCursor, setShowHeadingCursor] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -86,7 +86,7 @@ export default function Home() {
   useEffect(() => {
     if (callState !== 'idle') return;
 
-    const newText = `${onlineUsers} people online looking to date`;
+    const newText = `${onlineUsers} people online`;
     const oldText = displayedText;
 
     if (oldText === newText) return;
@@ -400,28 +400,14 @@ export default function Home() {
       case 'connected': return 'Connected';
       case 'no-users': return 'No one available';
       default: {
-        // Split displayedText into parts: "X people online" should be bold, rest normal
-        const parts = displayedText.match(/^(\d+\s+people\s+online)(.*)$/);
-        if (parts) {
-          const [, numberPart, restPart] = parts;
-          return (
-            <>
-              <span style={{ fontSize: '42px', fontWeight: 400 }}>There are </span>
-              <span style={{ fontSize: '56px', fontWeight: 700 }}>{numberPart}</span>
-              <span style={{ fontSize: '42px', fontWeight: 400 }}>{restPart}</span>
-              <span style={{
-                opacity: showHeadingCursor ? 1 : 0,
-                fontSize: '42px',
-                fontWeight: 400
-              }}>|</span>
-            </>
-          );
-        }
         return (
           <>
-            There are {displayedText}
+            {displayedText}
             <span style={{
-              opacity: showHeadingCursor ? 1 : 0
+              opacity: showHeadingCursor && isAnimating ? 1 : 0,
+              marginLeft: '2px',
+              transition: 'opacity 0.1s',
+              display: 'inline-block'
             }}>|</span>
           </>
         );
