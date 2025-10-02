@@ -230,6 +230,18 @@ body {
 
 /* Add friend button hover shadow removed for flat design */
 
+/* Voice Activity Indicator Styles */
+.voice-activity-wrapper {
+  display: inline-block;
+  border: 5px solid transparent;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.voice-activity-wrapper.speaking {
+  border-color: #8b5cf6;
+}
+
 /* Logo Theme Styles */
 .logo {
   filter: none; /* Black in light mode */

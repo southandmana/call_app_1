@@ -11,6 +11,7 @@ import ErrorBanner from '@/components/ErrorBanner';
 import ThemeToggle from '@/components/ThemeToggle';
 import ControlBar from '@/components/ControlBar';
 import AccountMenu from '@/components/AccountMenu';
+import VoiceActivityIndicator from '@/components/VoiceActivityIndicator';
 import axios from 'axios';
 
 type CallState = 'idle' | 'searching' | 'connected' | 'no-users';
@@ -30,6 +31,7 @@ export default function Home() {
     preferredCountries: [],
     nonPreferredCountries: []
   });
+  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
 
   // Error states
   const [errorModal, setErrorModal] = useState<{
@@ -132,6 +134,7 @@ export default function Home() {
 
     manager.on('callStarted', () => {
       setCallState('connected');
+      setLocalStream(manager.getLocalStream());
     });
 
     manager.on('error', (data: { type: string; error: Error }) => {
@@ -162,6 +165,7 @@ export default function Home() {
     });
 
     manager.on('callEnded', () => {
+      setLocalStream(null);
       // Auto-call logic: if enabled, always restart (regardless of who ended it)
       if (autoCallEnabledRef.current) {
         console.log('Auto-call enabled, restarting search in 2 seconds...');
@@ -583,20 +587,21 @@ export default function Home() {
 
           {/* Call Button */}
           <div className="flex flex-col items-center">
-            <button
-              onClick={handleCallClick}
-              className={getCallButtonClass()}
-              disabled={callState === 'no-users'}
-              style={{
-                position: 'relative',
-                ...(callState === 'searching' && {
-                  background: 'transparent',
-                  border: '4px solid rgba(139, 92, 246, 0.2)',
-                  boxShadow: 'none',
-                  cursor: 'pointer'
-                })
-              }}
-            >
+            <VoiceActivityIndicator audioStream={localStream}>
+              <button
+                onClick={handleCallClick}
+                className={getCallButtonClass()}
+                disabled={callState === 'no-users'}
+                style={{
+                  position: 'relative',
+                  ...(callState === 'searching' && {
+                    background: 'transparent',
+                    border: '4px solid rgba(139, 92, 246, 0.2)',
+                    boxShadow: 'none',
+                    cursor: 'pointer'
+                  })
+                }}
+              >
               <span style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -636,6 +641,7 @@ export default function Home() {
                 }} />
               )}
             </button>
+            </VoiceActivityIndicator>
 
             <style jsx>{`
               @keyframes spin {

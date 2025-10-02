@@ -273,6 +273,10 @@ class WebRTCManagerClass implements WebRTCManager {
     return this.connectionState === 'connected';
   }
 
+  getLocalStream(): MediaStream | null {
+    return this.localStream;
+  }
+
   // Event system methods
   on(event: string, callback: Function): void {
     if (!this.eventListeners.has(event)) {
