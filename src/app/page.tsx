@@ -198,7 +198,7 @@ export default function Home() {
         setShowDisconnectedMessage(false);
         // Start ringing sound
         if (!ringingAudioRef.current) {
-          ringingAudioRef.current = playLoopingSound('/ringing.mp3', 0.3);
+          ringingAudioRef.current = playLoopingSound('/ringing.mp3', 1);
         }
       } else if (state === 'connected') {
         setCallState('connected');
@@ -324,6 +324,7 @@ export default function Home() {
         setIsConfirmingHangup(true);
       } else {
         // Second click: Actually end the call
+        playSound('/call-end.mp3', 0.5);
         setIsConfirmingHangup(false);
         webrtcManager.endCall();
         // State will be updated by onStateChange callback
