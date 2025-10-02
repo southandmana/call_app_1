@@ -16,7 +16,7 @@ export default function VoiceActivityIndicator({ audioStream, children }: VoiceA
   useEffect(() => {
     if (!audioStream) {
       // Cleanup when stream is null
-      if (audioContextRef.current) {
+      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
         audioContextRef.current.close();
         audioContextRef.current = null;
       }
@@ -76,7 +76,7 @@ export default function VoiceActivityIndicator({ audioStream, children }: VoiceA
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
-      if (audioContextRef.current) {
+      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
         audioContextRef.current.close();
       }
       analyserRef.current = null;
