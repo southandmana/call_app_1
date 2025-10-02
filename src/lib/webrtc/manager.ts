@@ -24,6 +24,7 @@ class WebRTCManagerClass implements WebRTCManager {
   private eventListeners: Map<string, Function[]> = new Map();
   private socketListenersSetup: boolean = false;
   private isManualHangup: boolean = false;
+  private isCleaningUp: boolean = false;
   peer: Peer.Instance | null = null;
   localStream: MediaStream | null = null;
   remoteAudio: HTMLAudioElement | null = null;
@@ -176,6 +177,13 @@ class WebRTCManagerClass implements WebRTCManager {
       // Handle close
       this.peer.on('close', () => {
         console.log('Peer connection closed');
+        console.log('🟡 Close handler - isCleaningUp:', this.isCleaningUp);
+        // Don't change state if we're in cleanup (endCall triggered this)
+        if (this.isCleaningUp) {
+          console.log('✅ Ignoring close event during cleanup - resetting flag');
+          this.isCleaningUp = false;  // Reset flag now that close event has fired
+          return;
+        }
         if (this.connectionState === 'connected') {
           // Connection dropped mid-call
           this.emit('connectionDropped');
@@ -206,7 +214,10 @@ class WebRTCManagerClass implements WebRTCManager {
   }
 
   endCall(isManual: boolean = true): void {
+    console.log('🔴 END CALL STARTED - NEW CODE VERSION 2.0');
     this.isManualHangup = isManual;
+    this.isCleaningUp = true;
+    console.log('🔴 isCleaningUp set to TRUE');
 
     // If ending call during search (no peer yet), leave the queue
     if (isManual && !this.peer && this.connectionState === 'connecting') {
@@ -238,6 +249,8 @@ class WebRTCManagerClass implements WebRTCManager {
     this.isMuted = false;
     this.setState('idle');
     this.emit('callEnded', { wasManualHangup: isManual });
+    // Don't reset isCleaningUp here - the peer 'close' event is async and hasn't fired yet
+    // It will be reset when the close handler runs or when starting a new call
   }
 
   toggleMute(): boolean {
@@ -281,6 +294,9 @@ class WebRTCManagerClass implements WebRTCManager {
         console.warn('startCall called while not idle, ignoring');
         return;
       }
+
+      // Safety: Reset cleanup flag at the start of a new call
+      this.isCleaningUp = false;
 
       // Setup socket listeners first
       this.setupSocketListeners();

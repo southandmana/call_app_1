@@ -123,6 +123,29 @@ io.on('connection', async (socket) => {
   socket.on('join-queue', (filters) => {
     console.log('User joined queue:', socket.id, 'with filters:', filters);
 
+    // Guard: Check if user is already in an active connection
+    const existingConnection = activeConnections.get(socket.id);
+    if (existingConnection) {
+      console.log('User tried to join queue while in active connection, cleaning up stale state:', socket.id);
+
+      // Clean up the stale connection
+      activeConnections.delete(socket.id);
+      activeConnections.delete(existingConnection.peerId);
+
+      // Leave the old room
+      socket.leave(existingConnection.roomId);
+
+      // Notify peer that connection was cleaned up
+      io.to(existingConnection.peerId).emit('peer-disconnected');
+    }
+
+    // Guard: Check if user is already in the waiting queue
+    const queueIndex = waitingQueue.findIndex(s => s.id === socket.id);
+    if (queueIndex !== -1) {
+      console.log('User already in queue, removing duplicate:', socket.id);
+      waitingQueue.splice(queueIndex, 1);
+    }
+
     // Store filters with the socket
     socket.userFilters = filters || { interests: [], preferredCountries: [], nonPreferredCountries: [] };
 
@@ -205,8 +228,12 @@ io.on('connection', async (socket) => {
       activeConnections.delete(socket.id);
       activeConnections.delete(connection.peerId);
 
-      // Leave room
+      // Leave room - both this socket and the peer
       socket.leave(connection.roomId);
+      const peerSocket = io.sockets.sockets.get(connection.peerId);
+      if (peerSocket) {
+        peerSocket.leave(connection.roomId);
+      }
 
       console.log(`Call ended between ${socket.id} and ${connection.peerId}`);
     }
