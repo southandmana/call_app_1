@@ -113,6 +113,7 @@ export default function FilterDropdown({
       style={{
         width: '100%',
         padding: 'var(--space-md)',
+        background: 'white',
         animation: 'slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
       }}
     >
