@@ -38,6 +38,30 @@ class WebRTCManagerClass implements WebRTCManager {
     this.onStateChange?.(newState);
   }
 
+  private async requestMicrophone(): Promise<void> {
+    try {
+      this.localStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 48000
+        },
+        video: false
+      });
+    } catch (micError: any) {
+      console.error('Microphone access denied:', micError);
+      const error = new Error('MICROPHONE_PERMISSION_DENIED');
+      (error as any).originalError = micError;
+      this.emit('error', { type: 'mic-permission', error });
+
+      // Cleanup: leave queue and disconnect socket
+      socketManager.leaveQueue();
+
+      throw error;
+    }
+  }
+
   private setupSocketListeners(): void {
     if (this.socketListenersSetup) return;
 
@@ -92,21 +116,9 @@ class WebRTCManagerClass implements WebRTCManager {
     try {
       this.setState('creating');
 
-      // Get user media (audio only)
-      try {
-        this.localStream = await navigator.mediaDevices.getUserMedia({
-          audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true,
-            sampleRate: 48000
-          },
-          video: false
-        });
-      } catch (micError: any) {
-        console.error('Microphone access denied:', micError);
-        const error = new Error('MICROPHONE_PERMISSION_DENIED');
-        (error as any).originalError = micError;
+      // Validate that local stream exists (should have been created in startCall)
+      if (!this.localStream) {
+        const error = new Error('NO_LOCAL_STREAM');
         this.emit('error', { type: 'mic-permission', error });
         this.setState('idle');
         throw error;
@@ -264,11 +276,23 @@ class WebRTCManagerClass implements WebRTCManager {
   // Required interface methods
   async startCall(filters?: { interests: string[]; preferredCountries: string[]; nonPreferredCountries: string[] }): Promise<void> {
     try {
+      // Guard against duplicate calls
+      if (this.connectionState !== 'idle') {
+        console.warn('startCall called while not idle, ignoring');
+        return;
+      }
+
       // Setup socket listeners first
       this.setupSocketListeners();
 
       // Connect to signaling server
       await socketManager.connect();
+
+      // Set state to creating (triggers 'requesting mic' UI)
+      this.setState('creating');
+
+      // Request microphone permission BEFORE joining queue
+      await this.requestMicrophone();
 
       // Set state to connecting BEFORE joining queue (prevents race condition)
       this.setState('connecting');
@@ -279,6 +303,13 @@ class WebRTCManagerClass implements WebRTCManager {
       // Don't emit callStarted here - wait for onMatched callback
     } catch (error) {
       console.error('Failed to start call:', error);
+
+      // Cleanup on error
+      if (this.localStream) {
+        this.localStream.getTracks().forEach(track => track.stop());
+        this.localStream = null;
+      }
+
       this.setState('idle');
       throw error;
     }

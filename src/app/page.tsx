@@ -595,7 +595,7 @@ export default function Home() {
             <button
               onClick={handleCallClick}
               className={getCallButtonClass()}
-              disabled={callState === 'no-users'}
+              disabled={callState !== 'idle'}
               style={{
                 position: 'relative',
                 ...(callState === 'searching' && {
