@@ -496,7 +496,7 @@ export default function Home() {
             style={{
               height: '36px',
               padding: '0 12px',
-              background: 'var(--bg-tertiary)',
+              background: 'transparent',
               border: '1px solid var(--border-primary)',
               borderRadius: '8px',
               display: 'flex',
@@ -526,13 +526,13 @@ export default function Home() {
           <div style={{
             width: '1px',
             height: '24px',
-            background: 'var(--border-primary)',
-            opacity: 0.5
+            background: 'var(--border-primary)'
           }}></div>
 
           {/* Filter Button */}
           <button
             onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+            className="header-icon-button"
             style={{
               width: '36px',
               height: '36px',
@@ -555,6 +555,7 @@ export default function Home() {
           {/* Account Button */}
           <button
             onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
+            className="header-icon-button"
             style={{
               width: '36px',
               height: '36px',

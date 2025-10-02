@@ -241,6 +241,12 @@ body {
   border-color: #8b5cf6;
 }
 
+/* Header Icon Button Hover */
+.header-icon-button:hover {
+  background: var(--bg-tertiary) !important;
+  border-color: var(--border-secondary) !important;
+}
+
 /* Logo Theme Styles */
 .logo {
   filter: none; /* Black in light mode */

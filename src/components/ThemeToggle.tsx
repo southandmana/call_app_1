@@ -76,7 +76,6 @@ export default function ThemeToggle() {
         .menu-button:hover {
           background: var(--bg-tertiary);
           border-color: var(--border-secondary);
-          transform: translateY(-1px);
         }
 
         .menu-button:active {
