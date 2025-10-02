@@ -1,8 +1,10 @@
 # AirTalk - Project Summary for UI/UX Work
 
-**Date:** September 30, 2025
+**Date:** September 30, 2025 (Updated: October 2, 2025)
 **Current Commit:** `f776a17` - "docs: update deployment completion status"
 **Status:** ✅ Fully deployed and operational
+
+> **📝 UPDATE (Oct 2, 2025):** Major UI redesign completed on Oct 1, 2025 (Phases 1-3). This guide reflects the pre-redesign architecture. Backend/WebRTC documentation below is still accurate, but UI components and layout have been significantly updated. See PROGRESS.md for UI redesign details.
 
 ---
 

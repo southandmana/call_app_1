@@ -104,6 +104,7 @@ src/
 - 🔓 Phone verification: Bypassed for testing (NEXT_PUBLIC_BYPASS_PHONE_VERIFICATION=true)
 
 **Recent Updates:**
+- ✅ Critical bug fixes: End Call button and call restart issues resolved (Oct 2, 2025)
 - ✅ Safari Socket.io connection issue resolved (Sept 30, 2025)
 - ✅ Cross-browser testing completed successfully
 - ✅ Phone verification bypass working on both platforms

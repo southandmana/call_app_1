@@ -1,5 +1,53 @@
 # Project Progress Log
 
+## Session: Bug Fixes - Call Restart Issue (Oct 2, 2025)
+
+### ✅ Critical Bug Fixes (COMPLETED)
+Fixed two major bugs preventing proper call flow and restart functionality.
+
+**Bug 1: End Call Button Disabled During Connected Calls**
+- **Issue:** Button was visible but completely non-functional when clicked during active calls
+- **Root Cause:** `disabled={callState !== 'idle'}` was disabling the button during 'connected' state
+- **Fix:** Changed condition to `disabled={callState === 'no-users'}` to only disable when no users online
+- **File Modified:** `src/app/page.tsx` (line 598)
+
+**Bug 2: Window That Ends Call Cannot Restart**
+- **Issue:** Whichever window/tab ended a call would get stuck and unable to start a new call
+- **Pattern:** Window 1 ends call → Window 1 stuck, Window 2 can restart. Window 2 ends call → Window 2 stuck, Window 1 can restart
+- **Root Cause:** Race condition between `endCall()` and async peer 'close' event
+  - Sequence:
+    1. `endCall()` sets state to 'idle' (line 249)
+    2. `peer.destroy()` triggers async 'close' event (line 232)
+    3. 'close' handler fires AFTER `endCall()` completes (line 178-191)
+    4. 'close' handler sets state to 'disconnected' - overwrites 'idle'
+    5. Next `startCall()` blocked by `connectionState !== 'idle'` guard
+- **Fix:** Implemented `isCleaningUp` flag to prevent 'close' handler from changing state during cleanup
+  - Line 27: Added `private isCleaningUp: boolean = false`
+  - Line 218: Set flag to TRUE before destroying peer
+  - Lines 182-185: Check flag in 'close' handler and skip state change if TRUE
+  - Line 184: Reset flag AFTER ignoring close event (not before, which was the timing bug)
+  - Line 299: Added safety reset at start of `startCall()`
+- **Files Modified:** `src/lib/webrtc/manager.ts` (lines 27, 178-185, 215-252, 290-299)
+
+**Debugging Challenges:**
+- Encountered aggressive browser caching preventing new code from loading
+- Multiple cache-clearing attempts needed (hard refresh, clear .next, DevTools storage clear)
+- Added debug logging (`🔴`, `🟡`, `✅` emoji logs) to verify new code was loading
+- Discovered timing issue: flag was being reset too early (before async event fired)
+
+**Testing Results:**
+- ✅ End Call button now functional during connected calls
+- ✅ Both windows can end calls and successfully restart new calls
+- ✅ No more stuck states after hanging up
+- ✅ Race condition fully resolved with proper flag timing
+
+**Technical Details:**
+- The key insight was that `peer.destroy()` triggers an async 'close' event that fires AFTER the `endCall()` function completes
+- Resetting `isCleaningUp = false` at the end of `endCall()` was too early
+- Solution: Reset flag inside the 'close' handler itself, AFTER skipping the unwanted state change
+
+---
+
 ## Session: UI Redesign - Phase 3 (Oct 1, 2025)
 
 ### ✅ Phase 3: Animations & Polish (COMPLETED)

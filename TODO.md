@@ -33,6 +33,24 @@
 
 ---
 
+## 🐛 BUG FIXES - CRITICAL ISSUES RESOLVED (Oct 2, 2025) ✅
+
+### Bug Fix 1: End Call Button Not Working (COMPLETED)
+- ✅ Fixed button disabled during connected calls
+- ✅ Changed condition from `disabled={callState !== 'idle'}` to `disabled={callState === 'no-users'}`
+- ✅ File: `src/app/page.tsx` (line 598)
+
+### Bug Fix 2: Call Restart Race Condition (COMPLETED)
+- ✅ Fixed window that ends call getting stuck and unable to restart
+- ✅ Root cause: Async peer 'close' event overwrote 'idle' state to 'disconnected'
+- ✅ Solution: Implemented `isCleaningUp` flag with proper timing
+- ✅ Flag prevents 'close' handler from changing state during cleanup
+- ✅ Flag reset AFTER async close event fires (not before - key insight)
+- ✅ File: `src/lib/webrtc/manager.ts` (lines 27, 178-185, 215-252, 290-299)
+- ✅ Testing: Both windows can now end calls and restart successfully
+
+---
+
 ## 🚨 CURRENT STATUS - DEPLOYED TO PRODUCTION ✅
 
 **Production URLs:**
