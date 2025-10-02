@@ -256,6 +256,12 @@ export default function Home() {
   useEffect(() => {
     const connectSocket = async () => {
       try {
+        // Skip if already connected (prevents duplicate connections in Strict Mode)
+        if (socketManager.isConnected) {
+          console.log('Socket already connected, skipping duplicate connect');
+          return;
+        }
+
         await socketManager.connect();
 
         socketManager.onUserCount = (count: number) => {
@@ -306,6 +312,8 @@ export default function Home() {
       socketManager.onReconnecting = undefined;
       socketManager.onReconnected = undefined;
       socketManager.onSearchTimeout = undefined;
+      // Disconnect socket to prevent connection leaks on HMR
+      socketManager.disconnect();
     };
   }, []);
 

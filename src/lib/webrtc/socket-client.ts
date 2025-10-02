@@ -63,9 +63,7 @@ class SocketManagerClass implements SocketManager {
         reconnectionDelayMax: 5000,     // Max 5 seconds between reconnect attempts
         reconnectionAttempts: Infinity, // Keep trying forever
         timeout: 10000,
-        pingTimeout: 5000,              // Client waits max 5s for ping from server before disconnect
-        pingInterval: 2000,             // Client expects ping every 2s from server
-        transports: ['websocket', 'polling'],
+        transports: ['websocket'],      // Force WebSocket only (prevents polling upgrade cycles)
         auth: {
           sessionId: sessionId
         }
