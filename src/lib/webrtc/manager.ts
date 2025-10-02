@@ -270,6 +270,9 @@ class WebRTCManagerClass implements WebRTCManager {
       // Connect to signaling server
       await socketManager.connect();
 
+      // Set state to connecting BEFORE joining queue (prevents race condition)
+      this.setState('connecting');
+
       // Start searching for a match with filters
       socketManager.startCall(filters);
 
