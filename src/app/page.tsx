@@ -312,6 +312,7 @@ export default function Home() {
       }
     } else if (callState === 'searching') {
       // Cancel the search
+      playSound('/call-cancel.mp3', 0.5);
       webrtcManager.endCall(true);
       // State will be updated by onStateChange callback
     } else if (callState === 'connected') {
