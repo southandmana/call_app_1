@@ -77,15 +77,24 @@ body {
 }
 
 .call-button-connected {
-  background: var(--error) !important;
-  color: white !important;
+  background: white !important;
+  color: black !important;
   box-shadow: 0 12px 48px rgba(239, 68, 68, 0.4) !important;
 }
 
 .call-button-connected:hover {
-  background: #f15a5a;
+  background: #f0f0f0 !important;
   box-shadow: 0 16px 60px rgba(239, 68, 68, 0.6);
   animation: none !important;
+}
+
+[data-theme="light"] .call-button-connected {
+  background: black !important;
+  color: white !important;
+}
+
+[data-theme="light"] .call-button-connected:hover {
+  background: #1a1a1a !important;
 }
 
 .call-button-connected:active {
