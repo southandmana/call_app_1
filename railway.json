@@ -1,7 +1,7 @@
 {
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "npm install --production"
+    "buildCommand": "npm install socket.io@^4.8.1 @supabase/supabase-js@^2.58.0 dotenv@^17.2.3 --production"
   },
   "deploy": {
     "startCommand": "node src/lib/socket-server.js",
