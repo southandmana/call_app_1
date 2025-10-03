@@ -80,6 +80,10 @@ class SocketManagerClass implements SocketManager {
         console.log('🟢 CONNECTED - Socket ID:', this.socket?.id);
         console.log('🟢 Transport:', this.socket?.io?.engine?.transport?.name);
         this.isConnected = true;
+        // Clear reconnecting state on successful connection (initial or reconnect)
+        if (this.onReconnected) {
+          this.onReconnected();
+        }
         resolve();
       });
 

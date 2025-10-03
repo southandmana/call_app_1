@@ -142,6 +142,13 @@ src/
 - 🔓 Phone verification: Bypassed for testing (NEXT_PUBLIC_BYPASS_PHONE_VERIFICATION=true)
 
 **Recent Updates:**
+- ✅ Critical production fixes completed (Oct 4, 2025):
+  - Railway build failure fixed (nixpacks.toml skips NextAuth dependencies)
+  - Runtime error "setIsVerified is not defined" fixed (removed leftover Phase 1 code)
+  - Socket connection banner fixed (resolved race condition with userId)
+  - Ringing sound persistence fixed (disabled refetchOnWindowFocus in SessionProvider)
+  - Call matching restored (reverted dependency array to prevent WebRTC manager destruction)
+- ✅ Phase 1 complete: Google OAuth authentication (Oct 4, 2025)
 - ✅ Header redesign: Online counter with user icon in filled rectangle, circular navigation buttons (Oct 3, 2025)
 - ✅ UI refinements: Minimalist transparent container design (Oct 2, 2025)
 - ✅ Major UI redesign: New layout, ControlBar, animations (Oct 1, 2025)

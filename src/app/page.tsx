@@ -226,14 +226,21 @@ export default function Home() {
   useEffect(() => {
     const connectSocket = async () => {
       try {
-        // Skip if already connected (prevents duplicate connections in Strict Mode)
-        if (socketManager.isConnected) {
-          console.log('Socket already connected, skipping duplicate connect');
+        // Don't connect if not authenticated yet
+        if (status !== 'authenticated' || !session?.user) {
           return;
         }
 
-        await socketManager.connect();
+        const user = session.user as any;
+        const userId = user.id;
 
+        // Only connect if not already connected (prevents duplicate connections in Strict Mode)
+        if (!socketManager.isConnected) {
+          await socketManager.connect(userId);
+        }
+
+        // ALWAYS set up callbacks (even if already connected)
+        // This ensures callbacks are properly set up after HMR/remount
         socketManager.onUserCount = (count: number) => {
           setOnlineUsers(count);
         };
@@ -241,7 +248,6 @@ export default function Home() {
         socketManager.onAuthRequired = (data: { message: string }) => {
           console.log('Auth required:', data.message);
           setShowVerification(true);
-          setIsVerified(false);
         };
 
         socketManager.onDisconnected = () => {
@@ -290,7 +296,7 @@ export default function Home() {
       // Disconnect socket to prevent connection leaks on HMR
       socketManager.disconnect();
     };
-  }, []);
+  }, [status, session]);
 
   const handleCallClick = async () => {
     if (!webrtcManager) return;

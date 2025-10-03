@@ -174,6 +174,13 @@ This allows Railway to connect from your Vercel frontend.
 - Verify all environment variables are set
 - Check Railway logs for specific error
 
+### Railway Build Timeout or Dependency Errors
+- **Issue:** Build fails with "Cannot find module 'bcrypt'" or times out during "importing to docker" step
+- **Cause:** Railway installing ALL package.json dependencies including NextAuth which the Socket.IO server doesn't need
+- **Fix:** Create `nixpacks.toml` in project root (see Railway-Specific Configuration section above)
+- **Verify:** Check Railway build logs show only 3 packages installed (socket.io, @supabase/supabase-js, dotenv)
+- **Build time:** Should complete in <2 minutes after fix
+
 ---
 
 ## Last Known Working State
@@ -334,3 +341,53 @@ After successful deployment:
 - [ ] Beta testing complete (30+ users, no critical bugs)
 
 See [LAUNCH_PLAN.md](./LAUNCH_PLAN.md) for full 6-week roadmap.
+
+---
+
+## Railway-Specific Configuration
+
+### nixpacks.toml Build Configuration
+
+Railway deployments require a custom build configuration to avoid installing unnecessary NextAuth dependencies that cause build failures and timeouts.
+
+**Create this file in your project root:**
+
+**File:** `/nixpacks.toml`
+```toml
+[phases.setup]
+nixPkgs = ["nodejs_18"]
+
+[phases.install]
+cmds = ["echo 'Skipping npm ci - installing only required dependencies'"]
+
+[phases.build]
+cmds = ["npm install socket.io@^4.8.1 @supabase/supabase-js@^2.58.0 dotenv@^17.2.3 --production"]
+
+[start]
+cmd = "node src/lib/socket-server.js"
+```
+
+**Why this is needed:**
+- Railway's default Nixpacks builder runs `npm ci` which installs ALL dependencies from package.json
+- NextAuth dependencies (next-auth, bcrypt, etc.) are only needed for the Vercel frontend, not the Socket.IO server
+- The Socket.IO server only needs 3 packages: socket.io, @supabase/supabase-js, and dotenv
+- Installing unnecessary dependencies causes:
+  - Build timeouts (>10 minutes)
+  - Native module compilation errors (bcrypt)
+  - Larger Docker images
+  - Slower deployments
+
+**What this configuration does:**
+1. **setup**: Uses Node.js 18
+2. **install**: Skips the default `npm ci` command
+3. **build**: Manually installs only the 3 required packages
+4. **start**: Runs the Socket.IO server
+
+**Result:**
+- Build time: <2 minutes (vs timeout)
+- Smaller Docker image
+- No dependency conflicts
+- Faster deployments
+
+**Alternative approach (not recommended):**
+You could move NextAuth dependencies to `devDependencies` in package.json, but this complicates the Vercel frontend build process.

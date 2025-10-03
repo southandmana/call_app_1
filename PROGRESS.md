@@ -1,5 +1,88 @@
 # Project Progress Log
 
+## Session: Production Stability Fixes - Phase 1 Post-Launch (Oct 4, 2025)
+
+### ✅ Critical Production Fixes (COMPLETED)
+Fixed 5 critical issues discovered after Phase 1 (Google OAuth) deployment that prevented production use.
+
+**Context:**
+Phase 1 (Google OAuth authentication) was completed and deployed on October 4, 2025. Immediately after deployment, several issues surfaced that blocked production functionality. These fixes were implemented in rapid succession to restore full operational status.
+
+**Issues Fixed:**
+
+**1. Railway Build Failure - NextAuth Dependencies**
+- **Problem:** Railway build timing out or failing with "Cannot find module 'bcrypt'"
+- **Root Cause:** Railway's default `npm ci` command installing ALL package.json dependencies including NextAuth, which is only needed for Vercel frontend
+- **Investigation:** Railway build logs showed bcrypt native compilation failing; Socket.IO server doesn't need NextAuth
+- **Solution:** Created `nixpacks.toml` configuration file to skip `npm ci` and manually install only required packages: socket.io, @supabase/supabase-js, dotenv
+- **Files Changed:**
+  - `nixpacks.toml` (new file, project root)
+  - `railway.json` (modified to reference nixpacks config)
+- **Result:** Build time reduced from timeout to <2 minutes, stable deployments
+
+**2. Runtime Error: "setIsVerified is not defined"**
+- **Problem:** Application crashing with ReferenceError when onAuthRequired callback triggered
+- **Root Cause:** Leftover code from Phase 1 OAuth migration - `setIsVerified(false);` line referencing removed state variable
+- **Investigation:** Browser console showed error in onAuthRequired callback, traced to line 244 in page.tsx
+- **Solution:** Removed the single line `setIsVerified(false);` from onAuthRequired handler
+- **Files Changed:**
+  - `src/app/page.tsx` (line 244 removed)
+- **Result:** No more crashes when socket authentication fails
+
+**3. Persistent "Connection lost. Reconnecting..." Banner**
+- **Problem:** Socket connection banner displaying "Reconnecting..." even when connection was working
+- **Root Cause:** Race condition in socket initialization - socket connecting before userId available from session, server rejecting connection due to missing userId, then reconnecting with userId
+- **Investigation:** Socket.IO server logs showed "No userId provided" error followed by successful connection; banner not being cleared on successful reconnect
+- **Solution:**
+  - Modified useEffect to wait for authenticated session (status === 'authenticated' && session?.user) before calling socketManager.connect()
+  - Added userId parameter to socket.connect() call
+  - Added `onReconnected()` call in the connect event handler (not just reconnect)
+- **Files Changed:**
+  - `src/app/page.tsx` (socket connection useEffect)
+  - `src/lib/webrtc/socket-client.ts` (connect event handler)
+- **Result:** Banner only shows when truly disconnected, clears immediately on successful connection
+
+**4. Ringing Sound Stops on Tab Switch**
+- **Problem:** Ringing sound stops playing when user switches browser tabs during call search
+- **Root Cause:** NextAuth's default `refetchOnWindowFocus={true}` behavior causes session object to be refreshed when window regains focus → session object reference changes → useEffect cleanup runs → ringing audio stops
+- **Investigation:** Console logs showed session object changing when tab switched back; traced to NextAuth's SessionProvider refetch behavior
+- **Solution:** Added `refetchOnWindowFocus={false}` to SessionProvider in layout.tsx
+- **Files Changed:**
+  - `src/app/layout.tsx` (SessionProvider props)
+- **Result:** Ringing continues uninterrupted until call connects or user cancels
+
+**5. Broken Call Matching After userId Fix Attempt**
+- **Problem:** Random call matching completely stopped working after attempting to fix ringing issue
+- **Root Cause:** Changed useEffect dependency array from `[status, session]` to `[status, userId]` which caused useEffect to rerun when userId changed from null (loading) to actual UUID (authenticated) → WebRTC manager destroyed and recreated mid-authentication → breaking call functionality
+- **Investigation:** Tested call matching after userId dependency change, no matches happening; browser console showed WebRTC manager being destroyed when userId populated; realized Fix #4 (refetchOnWindowFocus) solves session object stability
+- **Solution:** Reverted useEffect dependency back to `[status, session]` - works correctly with `refetchOnWindowFocus={false}` preventing session object changes
+- **Files Changed:**
+  - `src/app/page.tsx` (reverted useEffect dependencies, removed userId extraction)
+- **Result:** Call matching fully restored, works as before Phase 1 migration
+
+**Technical Lessons:**
+- Railway requires explicit build configuration to avoid frontend dependencies
+- NextAuth SessionProvider behavior significantly impacts useEffect cleanup
+- Session object stability more important than extracting individual fields for dependencies
+- Race conditions in async authentication require careful useEffect ordering
+
+**Files Modified This Session:**
+- `nixpacks.toml` (created)
+- `railway.json` (modified)
+- `src/app/page.tsx` (3 modifications: removed setIsVerified, fixed socket connection, reverted userId extraction)
+- `src/app/layout.tsx` (added refetchOnWindowFocus prop)
+- `src/lib/webrtc/socket-client.ts` (added onReconnected call in connect handler)
+
+**Testing Results:**
+- ✅ Railway builds successfully in <2 minutes
+- ✅ No runtime errors on authentication failure
+- ✅ Socket connection banner works correctly
+- ✅ Ringing sound persists through tab switches
+- ✅ Call matching works end-to-end
+- ✅ All Phase 1 functionality verified working
+
+---
+
 ## Session: Header Redesign - Online Counter & Circular Buttons (Oct 3, 2025)
 
 ### ✅ Header Navigation Polish (COMPLETED)

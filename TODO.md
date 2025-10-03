@@ -72,8 +72,12 @@
 - ✅ Interest-based matching
 - ✅ Online user count (real-time)
 - ✅ Error handling (mic permission, connection drops, no users)
+- ✅ Google OAuth authentication (Phase 1 complete)
 - ✅ Phone verification bypass for testing
 - ✅ Chrome, Firefox, and Safari all tested successfully
+- ✅ Railway build optimized (nixpacks.toml configuration)
+- ✅ Socket connection stability improved (race condition fixes)
+- ✅ Call ringing persists through tab switches
 
 **System Status:**
 - 🟢 **Fully Operational** - Ready for friend testing
@@ -89,6 +93,48 @@ git reset --hard 9a0fab7
 git push --force origin main
 # Railway and Vercel will auto-redeploy
 ```
+
+---
+
+## 🐛 PRODUCTION FIXES COMPLETED (Oct 4, 2025) ✅
+
+### Fix 1: Railway Build Failure (COMPLETED)
+- ✅ **Issue:** Railway build timing out due to NextAuth dependencies
+- ✅ **Root cause:** Socket.IO server doesn't need NextAuth but `npm ci` installed everything
+- ✅ **Solution:** Created `nixpacks.toml` to install only required packages (socket.io, @supabase/supabase-js, dotenv)
+- ✅ **Files:** `nixpacks.toml` (new file), `railway.json` (modified)
+- ✅ **Result:** Build time reduced from timeout to <2 minutes
+
+### Fix 2: Runtime Error "setIsVerified is not defined" (COMPLETED)
+- ✅ **Issue:** Error when authentication required callback triggered
+- ✅ **Root cause:** Leftover code from Phase 1 OAuth migration referencing removed state variable
+- ✅ **Solution:** Removed `setIsVerified(false);` line from onAuthRequired callback
+- ✅ **Files:** `src/app/page.tsx` (line 244 removed)
+- ✅ **Result:** No more runtime errors on auth failure
+
+### Fix 3: Persistent "Connection lost. Reconnecting..." Banner (COMPLETED)
+- ✅ **Issue:** Banner showing even when socket connected successfully
+- ✅ **Root cause:** Race condition - socket connected without userId, rejected, then reconnected
+- ✅ **Solution:**
+  - Changed socket connection useEffect to wait for authenticated session before connecting
+  - Pass userId to socket.connect()
+  - Added onReconnected() call on initial connect event
+- ✅ **Files:** `src/app/page.tsx`, `src/lib/webrtc/socket-client.ts`
+- ✅ **Result:** Banner only shows when truly disconnected
+
+### Fix 4: Ringing Sound Stops on Tab Switch (COMPLETED)
+- ✅ **Issue:** Ringing stops when user switches browser tabs during call search
+- ✅ **Root cause:** NextAuth's `refetchOnWindowFocus` changes session object → useEffect cleanup runs → ringing stops
+- ✅ **Solution:** Added `refetchOnWindowFocus={false}` to SessionProvider
+- ✅ **Files:** `src/app/layout.tsx` (line 39)
+- ✅ **Result:** Ringing continues until call connects or cancelled
+
+### Fix 5: Broken Call Matching After userId Fix Attempt (COMPLETED)
+- ✅ **Issue:** Random call matching stopped working entirely
+- ✅ **Root cause:** Changed useEffect dependency from `[status, session]` to `[status, userId]` caused WebRTC manager destruction when userId changed from null to actual value
+- ✅ **Solution:** Reverted to `[status, session]` dependency (works with `refetchOnWindowFocus={false}`)
+- ✅ **Files:** `src/app/page.tsx` (reverted lines 24 and 223)
+- ✅ **Result:** Call matching fully restored, works as before Phase 1 migration
 
 ---
 
