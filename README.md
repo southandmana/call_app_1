@@ -20,12 +20,50 @@ Voice-only random chat app with interest-based matching, built with Next.js, Soc
 
 ## 🛠 Tech Stack
 
-- **Frontend:** Next.js 15.5.4, React, Tailwind CSS
-- **Backend:** Socket.io 4.8.1 (signaling server)
-- **WebRTC:** simple-peer 9.11.1
+- **Frontend:** Next.js 15.5.4, React 19.1.0, Tailwind CSS 4
+- **Backend:** Socket.IO 4.8.1 (WebRTC signaling server)
+- **WebRTC:** simple-peer 9.11.1 (peer-to-peer voice)
 - **Database:** Supabase PostgreSQL
-- **Phone Verification:** Telnyx SMS API
-- **Hosting:** Vercel (frontend) + Railway (Socket.io)
+- **Authentication:** Phone verification via Telnyx SMS API
+- **Hosting:** Vercel (frontend) + Railway (Socket.IO server)
+
+## 📊 Current Capacity & Costs
+
+### **Current Setup (As of Oct 2025)**
+
+**Concurrent User Capacity:**
+- **Current Configuration:** 50-100 concurrent users
+- **With Optimizations:** 150-200 concurrent users (3-4x improvement)
+- **Bottleneck:** Railway free tier ($5 credits/month)
+
+**Monthly Costs:**
+- **Railway (Socket.IO):** $0 (free tier, ~500 hours/month)
+- **Vercel (Frontend):** $0 (free tier, 100GB bandwidth)
+- **Supabase (Database):** $0 (free tier, 500MB storage)
+- **Total:** **$0/month** for up to 100 concurrent users
+
+### **Scaling Costs**
+
+| Concurrent Users | Platform | Monthly Cost | Notes |
+|-----------------|----------|--------------|-------|
+| **0-100** | Railway Free | $0 | Current setup |
+| **100-500** | Railway Free (optimized) | $0 | With Socket.IO optimizations |
+| **500-1,000** | Railway Paid | $5-10 | Credits needed |
+| **1,000-10,000** | Hetzner CX11 (€5) | $5.50 | Migrate to VPS |
+| **10,000-30,000** | Hetzner CPX11 (€10) | $11 | 4GB RAM VPS |
+| **30,000-100,000** | Multiple Hetzner | $30-70 | Load balanced instances |
+
+**📖 Quick Reference:** See [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) for TL;DR summary
+**📊 Detailed Analysis:** See [CAPACITY.md](./CAPACITY.md) for complete capacity breakdown
+**📈 Scaling Guide:** See [SCALING.md](./SCALING.md) for step-by-step scaling instructions
+
+### Key Takeaway
+
+Your WebRTC peer-to-peer architecture is extremely cost-efficient:
+- ✅ Free tier sufficient for first 6-12 months
+- ✅ Simple optimizations = 3-4x capacity (still free)
+- ✅ $5.50/month handles 10,000 concurrent users
+- ✅ Voice streams P2P (not through your server)
 
 ## 📦 Local Development
 

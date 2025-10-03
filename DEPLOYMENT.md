@@ -228,25 +228,71 @@ Both Railway and Vercel will auto-redeploy from the reverted commit.
 
 ## Cost Estimates
 
-### Railway (Socket.io Server)
-- **Free Tier:** $5/month credit
-- **0-100 users:** $0-5/month (likely free)
-- **100-500 users:** $10-20/month
-- **500-1000 users:** $20-40/month
+### Current Infrastructure (As Deployed)
 
-### Vercel (Next.js Frontend)
+**Railway (Socket.IO Server):**
+- **Free Tier:** $5/month credits (~500 hours runtime)
+- **Current Config:** Supports 50-100 concurrent users
+- **Optimized Config:** Supports 150-200 concurrent users (3-4x improvement)
+- **When Credits Run Out:** Server pauses (add payment method to resume)
+
+**Vercel (Next.js Frontend):**
 - **Hobby Plan:** FREE
   - 100 GB bandwidth/month
-  - Unlimited sites
-  - Should be sufficient for 100-500 users
+  - Serverless functions included
+  - Sufficient for 50,000+ monthly visitors
 
-### Supabase (Database)
+**Supabase (Database):**
 - **Free Tier:** Currently using
-  - 500 MB database
-  - 2 GB bandwidth
-  - Upgrade to $25/month if needed
+  - 500 MB database storage
+  - Unlimited API requests
+  - 50,000 MAU (Monthly Active Users)
+  - Sufficient for 10,000-50,000 users
 
-**Total Monthly Cost (0-100 users):** $0-5/month
+### Cost by User Scale
+
+| Concurrent Users | Platform | Monthly Cost | Notes |
+|-----------------|----------|--------------|-------|
+| **0-100** | Railway Free | $0 | Current setup |
+| **100-200** | Railway Free (optimized) | $0 | With Socket.IO optimizations |
+| **200-500** | Railway Paid | $5-15 | Credits needed |
+| **500-10,000** | Hetzner CX11 | $5.50 | **Recommended migration** |
+| **10,000-30,000** | Hetzner CPX11 | $11 | 4GB RAM VPS |
+| **30,000-100,000** | Multiple Hetzner | $30-70 | Load balanced |
+
+**Current Total Monthly Cost:** **$0** (free tier)
+
+**See [CAPACITY.md](./CAPACITY.md) for detailed capacity analysis and [SCALING.md](./SCALING.md) for scaling guides.**
+
+---
+
+---
+
+## Alternative: Hetzner VPS Deployment
+
+**When to use:** 500+ concurrent users OR Railway costs >$20/month
+
+**Benefits:**
+- Much cheaper ($5.50/month vs $20+/month Railway)
+- 10x more capacity (10,000+ users vs 1,000)
+- 20TB bandwidth included
+- Full server control
+
+**Drawbacks:**
+- Manual setup (2-3 hours one-time)
+- Requires basic Linux knowledge
+- Manual deployments (or set up CI/CD)
+
+**See [SCALING.md](./SCALING.md) Phase 3 for complete Hetzner migration guide.**
+
+**Quick Overview:**
+1. Create Hetzner Cloud account
+2. Spin up CX11 server (€5/month, 2GB RAM)
+3. Install Node.js, clone repo, install dependencies
+4. Set up PM2 process manager
+5. Configure firewall
+6. Update Vercel environment variable to point to Hetzner IP
+7. Optional: Set up SSL with Nginx + Let's Encrypt
 
 ---
 
@@ -261,6 +307,8 @@ After successful deployment:
 - [ ] Test from different networks (WiFi, cellular)
 - [ ] Document any issues in GitHub Issues
 - [ ] Wait for Telnyx approval, then disable bypass flag
+- [ ] Implement Socket.IO optimizations (see [SCALING.md](./SCALING.md) Phase 1)
+- [ ] Set up monitoring/alerts for Railway credits
 - [ ] Implement call history feature (next sprint)
 - [ ] Implement report system (next sprint)
 

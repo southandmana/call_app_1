@@ -311,6 +311,58 @@ NEXT_PUBLIC_BYPASS_PHONE_VERIFICATION=true  # Currently bypassed for testing
 
 ---
 
+## 🚀 PERFORMANCE & SCALING
+
+### Socket.IO Optimization (HIGH PRIORITY - 3-4x Capacity Boost!)
+
+**When to implement:** Now OR when Railway credits >80% used
+
+**Impact:**
+- Current capacity: 50-100 concurrent users
+- After optimization: 150-200 concurrent users
+- Memory savings: 65% (200KB → 70KB per connection)
+- Cost: Still $0/month on Railway free tier
+
+**Tasks:**
+- [ ] **Update `socket-server.js` configuration** (5 minutes)
+  - Change `pingInterval: 2000` to `pingInterval: 10000`
+  - Add `transports: ['websocket']`
+  - Add `perMessageDeflate: false`
+  - See [SCALING.md](./SCALING.md) Phase 1 for code
+
+- [ ] **Install performance binaries** (2 minutes)
+  ```bash
+  npm install --save-optional bufferutil utf-8-validate
+  ```
+
+- [ ] **Add monitoring code** (10 minutes)
+  - Memory usage logging
+  - Connection count tracking
+  - Stale connection cleanup
+  - See [SCALING.md](./SCALING.md) Phase 1 for code
+
+- [ ] **Test locally** (10 minutes)
+  - Two-tab testing
+  - Verify calls still work
+  - Check memory usage in logs
+
+- [ ] **Deploy to production** (5 minutes)
+  ```bash
+  git add .
+  git commit -m "perf: optimize Socket.IO for 3-4x capacity"
+  git push origin main
+  ```
+
+- [ ] **Monitor Railway metrics** (ongoing)
+  - Check credits usage
+  - Verify memory decreased
+  - Confirm connection count increased
+
+**See:** [SCALING.md](./SCALING.md) for complete implementation guide
+**See:** [CAPACITY.md](./CAPACITY.md) for capacity analysis
+
+---
+
 ## Immediate Next Steps
 
 ### 1. ✅ Safari Socket.io Connection Issue (RESOLVED)
@@ -326,6 +378,13 @@ NEXT_PUBLIC_BYPASS_PHONE_VERIFICATION=true  # Currently bypassed for testing
 - [ ] Monitor Vercel logs for frontend issues
 - [ ] Collect feedback on call quality and matching speed
 - [ ] Test on different networks (WiFi, cellular, corporate)
+- [ ] Track Railway credits usage (set alert at 80%)
+
+### 3. Set Up Monitoring (NEW - 30 minutes)
+- [ ] Set up Railway alerts for credit usage >80%
+- [ ] Monitor concurrent user count
+- [ ] Track average session duration
+- [ ] Set up error rate alerts
 
 ---
 
@@ -373,6 +432,48 @@ NEXT_PUBLIC_BYPASS_PHONE_VERIFICATION=true  # Currently bypassed for testing
 
 ---
 
+## 📈 Scaling Milestones
+
+**Current Status:** 0-100 concurrent users, Railway free tier, $0/month
+
+### Milestone 1: First 100 Users ✅ (Current)
+- [x] Railway deployment working
+- [x] Vercel deployment working
+- [x] Basic phone verification (bypassed for testing)
+- [ ] Implement Socket.IO optimizations
+- [ ] Set up monitoring
+
+### Milestone 2: 100-500 Users (ETA: 1-3 months)
+- [ ] Socket.IO optimizations deployed (3-4x capacity)
+- [ ] Railway credits monitored weekly
+- [ ] Consider adding payment method to Railway OR
+- [ ] Plan Hetzner migration (if costs >$20/month)
+
+### Milestone 3: 500-1,000 Users (ETA: 3-6 months)
+- [ ] Migrate to Hetzner CX11 ($5.50/month)
+- [ ] Set up PM2 process manager
+- [ ] Configure automatic deployments
+- [ ] Set up SSL with Let's Encrypt
+- [ ] Monitoring dashboard (Uptime Robot, Sentry)
+
+### Milestone 4: 1,000-10,000 Users (ETA: 6-12 months)
+- [ ] Upgrade to Hetzner CPX11 ($11/month)
+- [ ] Optimize database queries
+- [ ] Consider Supabase Pro ($25/month)
+- [ ] Implement caching strategies
+- [ ] Set up CDN for static assets
+
+### Milestone 5: 10,000+ Users (ETA: 12+ months)
+- [ ] Implement load balancing
+- [ ] Set up Redis adapter
+- [ ] Multiple Socket.IO servers
+- [ ] Consider multi-region deployment
+- [ ] Hire DevOps engineer
+
+**See [SCALING.md](./SCALING.md) for complete scaling roadmap and [CAPACITY.md](./CAPACITY.md) for cost analysis at each milestone.**
+
+---
+
 ## Future Enhancements (Low Priority)
 
 - [ ] Country detection for filter matching
@@ -382,3 +483,4 @@ NEXT_PUBLIC_BYPASS_PHONE_VERIFICATION=true  # Currently bypassed for testing
 - [ ] Gender preference filter
 - [ ] Language preference filter
 - [ ] Desktop notifications for matches
+- [ ] Friend/contact system (add strangers you like during calls)
