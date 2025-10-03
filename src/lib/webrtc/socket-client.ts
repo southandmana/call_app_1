@@ -34,7 +34,7 @@ class SocketManagerClass implements SocketManager {
   onReconnected?: () => void;
   onSearchTimeout?: () => void;
 
-  connect(): Promise<void> {
+  connect(userId?: string): Promise<void> {
     return new Promise((resolve, reject) => {
       // If already connected, just resolve
       if (this.socket?.connected) {
@@ -50,8 +50,15 @@ class SocketManagerClass implements SocketManager {
         this.socket = null;
       }
 
-      // Get session ID from localStorage
-      const sessionId = typeof window !== 'undefined' ? localStorage.getItem('session_id') : null;
+      // Get userId - either passed in or from a stored session (for bypass mode)
+      let authUserId = userId;
+      if (!authUserId && typeof window !== 'undefined') {
+        // For bypass mode, use sessionId as temporary userId
+        const sessionId = localStorage.getItem('session_id');
+        if (sessionId) {
+          authUserId = sessionId;
+        }
+      }
 
       // Use production Socket.io URL or fallback to localhost for development
       const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001';
@@ -65,7 +72,7 @@ class SocketManagerClass implements SocketManager {
         timeout: 10000,
         transports: ['websocket'],      // Force WebSocket only (prevents polling upgrade cycles)
         auth: {
-          sessionId: sessionId
+          userId: authUserId
         }
       });
 

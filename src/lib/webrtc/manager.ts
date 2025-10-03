@@ -25,6 +25,7 @@ class WebRTCManagerClass implements WebRTCManager {
   private socketListenersSetup: boolean = false;
   private isManualHangup: boolean = false;
   private isCleaningUp: boolean = false;
+  private userId?: string;  // Store userId for socket authentication
   peer: Peer.Instance | null = null;
   localStream: MediaStream | null = null;
   remoteAudio: HTMLAudioElement | null = null;
@@ -33,6 +34,10 @@ class WebRTCManagerClass implements WebRTCManager {
   onStateChange?: (state: ConnectionState) => void;
   onSignalData?: (data: any) => void;
   onError?: (error: Error) => void;
+
+  constructor(userId?: string) {
+    this.userId = userId;
+  }
 
   private setState(newState: ConnectionState) {
     this.connectionState = newState;
@@ -307,8 +312,8 @@ class WebRTCManagerClass implements WebRTCManager {
       // Setup socket listeners first
       this.setupSocketListeners();
 
-      // Connect to signaling server
-      await socketManager.connect();
+      // Connect to signaling server with userId
+      await socketManager.connect(this.userId);
 
       // Set state to creating (triggers 'requesting mic' UI)
       this.setState('creating');

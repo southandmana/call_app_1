@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 interface PhoneVerificationProps {
-  onVerificationSuccess: (sessionId: string) => void;
+  onVerificationSuccess: () => void;
+  userId: string;
 }
 
-export default function PhoneVerification({ onVerificationSuccess }: PhoneVerificationProps) {
+export default function PhoneVerification({ onVerificationSuccess, userId }: PhoneVerificationProps) {
   const [step, setStep] = useState<'phone' | 'code'>('phone');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [code, setCode] = useState('');
@@ -55,12 +56,11 @@ export default function PhoneVerification({ onVerificationSuccess }: PhoneVerifi
       const response = await axios.post('/api/auth/verify-code', {
         phoneNumber: phoneNumber,
         code: code,
+        userId: userId,
       });
 
       if (response.data.success) {
-        // Store session ID in localStorage
-        localStorage.setItem('session_id', response.data.sessionId);
-        onVerificationSuccess(response.data.sessionId);
+        onVerificationSuccess();
       }
     } catch (err: any) {
       setError(err.response?.data?.error || 'Invalid code. Please try again.');

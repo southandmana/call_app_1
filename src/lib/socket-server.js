@@ -40,7 +40,8 @@ const io = new Server(httpServer, {
 
 // Simple queue for matching users
 let waitingQueue = [];
-let activeConnections = new Map(); // socketId -> { peerId, roomId }
+let activeConnections = new Map(); // socketId -> { peerId, roomId, userId, subscriptionTier }
+let userToSocket = new Map(); // userId -> socketId (for direct calls in Phase 3)
 
 // Function to broadcast user count to all clients
 function broadcastUserCount() {
@@ -76,38 +77,66 @@ function areFiltersCompatible(filters1, filters2) {
 io.on('connection', async (socket) => {
   console.log('User connected:', socket.id);
 
+  // Get userId from auth (changed from sessionId)
+  const userId = socket.handshake.auth.userId;
+
+  if (!userId) {
+    console.log('Connection rejected: No userId provided');
+    socket.emit('auth-required', { message: 'User ID required' });
+    socket.disconnect();
+    return;
+  }
+
   // Feature flag: bypass phone verification for testing
   const bypassVerification = process.env.NEXT_PUBLIC_BYPASS_PHONE_VERIFICATION === 'true';
 
   if (bypassVerification) {
     console.log('🚧 Phone verification bypassed (feature flag enabled) for:', socket.id);
+    // Store connection with userId
+    activeConnections.set(socket.id, {
+      userId,
+      subscriptionTier: 'free',
+      interests: [],
+      socketId: socket.id,
+      connectedAt: new Date().toISOString(),
+    });
+    userToSocket.set(userId, socket.id);
   } else {
-    // Validate session authentication
-    const sessionId = socket.handshake.auth.sessionId;
-
-    if (!sessionId) {
-      console.log('Connection rejected: No session ID provided');
-      socket.emit('auth-required', { message: 'Phone verification required' });
-      socket.disconnect();
-      return;
-    }
-
-    // Verify session with Supabase
+    // Verify user exists and is phone verified
     try {
-      const { data: session, error } = await supabase
-        .from('sessions')
-        .select('phone_verified')
-        .eq('session_id', sessionId)
+      const { data: user, error } = await supabase
+        .from('users')
+        .select('id, phone_verified, subscription_tier')
+        .eq('id', userId)
         .single();
 
-      if (error || !session || !session.phone_verified) {
-        console.log('Connection rejected: Invalid or unverified session');
+      if (error || !user) {
+        console.log('Connection rejected: Invalid user');
+        socket.emit('auth-required', { message: 'Invalid user' });
+        socket.disconnect();
+        return;
+      }
+
+      if (!user.phone_verified) {
+        console.log('Connection rejected: Phone not verified for user:', userId);
         socket.emit('auth-required', { message: 'Phone verification required' });
         socket.disconnect();
         return;
       }
 
-      console.log('User authenticated successfully:', socket.id);
+      console.log(`User ${userId} authenticated successfully (tier: ${user.subscription_tier})`);
+
+      // Store connection with userId
+      activeConnections.set(socket.id, {
+        userId,
+        subscriptionTier: user.subscription_tier,
+        interests: [],
+        socketId: socket.id,
+        connectedAt: new Date().toISOString(),
+      });
+
+      // Map userId to socketId (for direct calls in Phase 3)
+      userToSocket.set(userId, socket.id);
     } catch (error) {
       console.error('Auth validation error:', error);
       socket.emit('auth-required', { message: 'Authentication error' });
@@ -252,6 +281,9 @@ io.on('connection', async (socket) => {
     // Handle active connection cleanup
     const connection = activeConnections.get(socket.id);
     if (connection) {
+      // Remove from userId to socket mapping
+      userToSocket.delete(connection.userId);
+
       // Notify peer about disconnection
       socket.to(connection.peerId).emit('peer-disconnected');
 

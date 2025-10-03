@@ -5,11 +5,11 @@ import { randomUUID } from 'crypto';
 
 export async function POST(request: NextRequest) {
   try {
-    const { phoneNumber, code } = await request.json();
+    const { phoneNumber, code, userId } = await request.json();
 
-    if (!phoneNumber || !code) {
+    if (!phoneNumber || !code || !userId) {
       return NextResponse.json(
-        { error: 'Phone number and code are required' },
+        { error: 'Phone number, code, and userId are required' },
         { status: 400 }
       );
     }
@@ -87,43 +87,26 @@ export async function POST(request: NextRequest) {
       .update({ verified: true })
       .eq('id', verificationData.id);
 
-    // Create or update session
-    const sessionId = randomUUID();
+    // Update user with phone verification (one-time security check)
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({
+        phone_number: formattedPhone,
+        phone_verified: true,
+        phone_verified_at: new Date().toISOString(),
+      })
+      .eq('id', userId);
 
-    // Check if session already exists for this phone
-    const { data: existingSession } = await supabase
-      .from('sessions')
-      .select('*')
-      .eq('phone_number', formattedPhone)
-      .single();
-
-    if (existingSession) {
-      // Update existing session
-      await supabase
-        .from('sessions')
-        .update({
-          session_id: sessionId,
-          phone_verified: true,
-          phone_verified_at: new Date().toISOString(),
-          last_active: new Date().toISOString(),
-        })
-        .eq('id', existingSession.id);
-    } else {
-      // Create new session
-      await supabase
-        .from('sessions')
-        .insert({
-          session_id: sessionId,
-          phone_number: formattedPhone,
-          phone_verified: true,
-          phone_verified_at: new Date().toISOString(),
-          last_active: new Date().toISOString(),
-        });
+    if (updateError) {
+      console.error('Error updating user:', updateError);
+      return NextResponse.json(
+        { error: 'Failed to verify phone number' },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({
       success: true,
-      sessionId: sessionId,
       message: 'Phone verified successfully',
     });
   } catch (error: any) {
