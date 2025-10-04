@@ -53,9 +53,9 @@ Voice-first dating and friendship platform that facilitates authentic connection
 | **10,000-30,000** | Hetzner CPX11 (€10) | $11 | 4GB RAM VPS |
 | **30,000-100,000** | Multiple Hetzner | $30-70 | Load balanced instances |
 
-**📖 Quick Reference:** See [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) for TL;DR summary
-**📊 Detailed Analysis:** See [CAPACITY.md](./CAPACITY.md) for complete capacity breakdown
-**📈 Scaling Guide:** See [SCALING.md](./SCALING.md) for step-by-step scaling instructions
+**📖 Quick Reference:** See [QUICK_REFERENCE.md](./docs/archived/QUICK_REFERENCE.md) for TL;DR summary
+**📊 Detailed Analysis:** See [CAPACITY.md](./docs/archived/CAPACITY.md) for complete capacity breakdown
+**📈 Scaling Guide:** See [SCALING.md](./docs/archived/SCALING.md) for step-by-step scaling instructions
 
 ### Key Takeaway
 
@@ -108,36 +108,36 @@ NEXT_PUBLIC_BYPASS_PHONE_VERIFICATION=true  # Set to false for production
 
 **Essential Reading (Start Here):**
 
-1. **[PRODUCT_SPEC.md](./PRODUCT_SPEC.md)** - Complete feature specifications
+1. **[PRODUCT_SPEC.md](./docs/PRODUCT_SPEC.md)** - Complete feature specifications
    - What we're building and why
    - All planned features with detailed descriptions
    - User flows, monetization strategy, success metrics
 
-2. **[IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)** - Your single source of truth
+2. **[IMPLEMENTATION_PLAN.md](./docs/IMPLEMENTATION_PLAN.md)** - Your single source of truth
    - Current state (what's done vs. what's left)
    - Phased roadmap (MVP → Launch)
    - Task-by-task breakdown with dependencies
    - Progress tracking and challenge log
 
-3. **[TECHNOLOGY_STACK.md](./TECHNOLOGY_STACK.md)** - Technology & API selections
+3. **[TECHNOLOGY_STACK.md](./docs/TECHNOLOGY_STACK.md)** - Technology & API selections
    - All APIs researched (ID verification, AI, payments, etc.)
    - Cost breakdowns (MVP: ~$530/month, Growth: ~$2,660/month)
    - Implementation guides for each service
    - 90% cost savings strategies
 
-4. **[AI_WORKFLOW_GUIDE.md](./AI_WORKFLOW_GUIDE.md)** - How to work with AI effectively
+4. **[AI_WORKFLOW_GUIDE.md](./docs/AI_WORKFLOW_GUIDE.md)** - How to work with AI effectively
    - Step-by-step processes for each development phase
    - Error handling workflows
    - Validation and testing procedures
    - Best practices and common pitfalls
 
-5. **[LANDING_PAGE_STRUCTURE.md](./LANDING_PAGE_STRUCTURE.md)** - GitHub-inspired landing page design
+5. **[LANDING_PAGE_STRUCTURE.md](./docs/LANDING_PAGE_STRUCTURE.md)** - GitHub-inspired landing page design
    - 9 sections with placeholder content
    - Design system (colors, typography, components)
    - Responsive breakpoints and accessibility
 
 **Archived Documentation:**
-- Older docs moved to `/docs/archive/` (reference only)
+- Older docs moved to `/docs/archived/` (reference only)
 
 ## 🔧 Project Structure
 
@@ -194,7 +194,7 @@ src/
 - [ ] Enhance age verification (ID check)
 - [ ] Set up moderation system
 
-See [LAUNCH_PLAN.md](./LAUNCH_PLAN.md) for complete pre-launch checklist.
+See [LAUNCH_PLAN.md](./docs/archived/LAUNCH_PLAN.md) for complete pre-launch checklist.
 
 ## 📄 License
 
