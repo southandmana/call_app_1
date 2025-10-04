@@ -25,17 +25,18 @@ export default function Hero() {
   }, []);
 
   // Calculate opacity for each element based on scroll - memoized for performance
-  // Button fades out first (0-150px), then subheadline (150-250px), then headline (250-350px)
-  const { buttonOpacity, subheadlineOpacity, headlineOpacity } = useMemo(() => ({
-    buttonOpacity: Math.max(0, 1 - scrollY / 150),
-    subheadlineOpacity: Math.max(0, 1 - Math.max(0, scrollY - 50) / 150),
-    headlineOpacity: Math.max(0, 1 - Math.max(0, scrollY - 100) / 150),
+  // Sequential fade: Image (200-350px), Button (350-400px), Subheadline (400-450px), Headline (450-500px)
+  const { buttonOpacity, subheadlineOpacity, headlineOpacity, imageOpacity } = useMemo(() => ({
+    imageOpacity: Math.max(0, 1 - Math.max(0, scrollY - 200) / 150),
+    buttonOpacity: Math.max(0, 1 - Math.max(0, scrollY - 350) / 50),
+    subheadlineOpacity: Math.max(0, 1 - Math.max(0, scrollY - 400) / 50),
+    headlineOpacity: Math.max(0, 1 - Math.max(0, scrollY - 450) / 50),
   }), [scrollY]);
 
   return (
     <section className="relative" style={{
       background: 'linear-gradient(180deg, rgb(15, 23, 42) 0%, rgb(30, 27, 75) 30%, rgb(49, 27, 84) 60%, rgb(74, 29, 88) 85%, rgb(88, 28, 70) 100%)',
-      height: '1200px',
+      height: '1600px',
     }}>
 
       {/* Sticky Text Container */}
@@ -106,6 +107,29 @@ export default function Hero() {
                 </Link>
               </div>
             </FadeInView>
+
+            {/* Cupiduck Characters Image */}
+            <FadeInView delay={0.4}>
+              <div className="flex justify-center" style={{
+                marginTop: '-80px',
+                opacity: imageOpacity,
+                transition: 'opacity 0.1s ease-out',
+              }}>
+                <Image
+                  src="/cupiduck-duo.png"
+                  alt="Cupiduck characters"
+                  width={600}
+                  height={400}
+                  priority
+                  style={{
+                    objectFit: 'contain',
+                    maxWidth: '600px',
+                    width: '100%',
+                    height: 'auto',
+                  }}
+                />
+              </div>
+            </FadeInView>
           </div>
         </div>
       </div>
@@ -120,9 +144,9 @@ export default function Hero() {
       }}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center">
-            <FadeInView delay={0.4}>
+            <FadeInView delay={0.5}>
               <div
-                className="rounded-t-3xl relative"
+                className="rounded-t-3xl relative overflow-hidden"
                 style={{
                   maxWidth: '900px',
                   margin: '0 auto',
