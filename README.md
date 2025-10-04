@@ -1,6 +1,6 @@
-# AirTalk - Voice-Only Random Chat App
+# CQPDUK - Voice-First Connection Platform
 
-Voice-only random chat app with interest-based matching, built with Next.js, Socket.io, and WebRTC.
+Voice-first dating and friendship platform that facilitates authentic connections through anonymous voice calls, events, and AI-powered matching.
 
 ## 🌐 Production URLs
 
@@ -104,12 +104,40 @@ TELNYX_PHONE_NUMBER=your_telnyx_phone
 NEXT_PUBLIC_BYPASS_PHONE_VERIFICATION=true  # Set to false for production
 ```
 
-## 📚 Documentation
+## 📚 Core Documentation
 
-- [PROGRESS.md](./PROGRESS.md) - Development session logs
-- [TODO.md](./TODO.md) - Pending features and tasks
-- [DEPLOYMENT.md](./DEPLOYMENT.md) - Deployment guide for Railway + Vercel
-- [LAUNCH_PLAN.md](./LAUNCH_PLAN.md) - 6-week roadmap to public launch
+**Essential Reading (Start Here):**
+
+1. **[PRODUCT_SPEC.md](./PRODUCT_SPEC.md)** - Complete feature specifications
+   - What we're building and why
+   - All planned features with detailed descriptions
+   - User flows, monetization strategy, success metrics
+
+2. **[IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)** - Your single source of truth
+   - Current state (what's done vs. what's left)
+   - Phased roadmap (MVP → Launch)
+   - Task-by-task breakdown with dependencies
+   - Progress tracking and challenge log
+
+3. **[TECHNOLOGY_STACK.md](./TECHNOLOGY_STACK.md)** - Technology & API selections
+   - All APIs researched (ID verification, AI, payments, etc.)
+   - Cost breakdowns (MVP: ~$530/month, Growth: ~$2,660/month)
+   - Implementation guides for each service
+   - 90% cost savings strategies
+
+4. **[AI_WORKFLOW_GUIDE.md](./AI_WORKFLOW_GUIDE.md)** - How to work with AI effectively
+   - Step-by-step processes for each development phase
+   - Error handling workflows
+   - Validation and testing procedures
+   - Best practices and common pitfalls
+
+5. **[LANDING_PAGE_STRUCTURE.md](./LANDING_PAGE_STRUCTURE.md)** - GitHub-inspired landing page design
+   - 9 sections with placeholder content
+   - Design system (colors, typography, components)
+   - Responsive breakpoints and accessibility
+
+**Archived Documentation:**
+- Older docs moved to `/docs/archive/` (reference only)
 
 ## 🔧 Project Structure
 
