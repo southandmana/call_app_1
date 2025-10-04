@@ -1,3 +1,7 @@
+'use client';
+
+import FadeInView from '@/components/animations/FadeInView';
+
 export default function HowItWorks() {
   const steps = [
     {
@@ -34,105 +38,123 @@ export default function HowItWorks() {
     }}>
       <div className="max-w-7xl mx-auto px-6">
         {/* Section Headline */}
-        <div className="text-center mb-16">
-          <h2 style={{
-            fontSize: '40px',
-            fontWeight: 700,
-            letterSpacing: '-0.02em',
-            marginBottom: '16px',
-            color: 'var(--text-primary)',
-          }}>
-            How It Works
-          </h2>
-          <p style={{
-            fontSize: '18px',
-            color: 'var(--text-tertiary)',
-          }}>
-            Four simple steps to genuine connections
-          </p>
-        </div>
+        <FadeInView delay={0.1}>
+          <div className="text-center mb-16">
+            <h2 style={{
+              fontSize: '40px',
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
+              marginBottom: '16px',
+              color: 'var(--text-primary)',
+            }}>
+              How It Works
+            </h2>
+            <p style={{
+              fontSize: '18px',
+              color: 'var(--text-tertiary)',
+            }}>
+              Four simple steps to genuine connections
+            </p>
+          </div>
+        </FadeInView>
 
         {/* Steps Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {steps.map((step, index) => (
-            <div key={index} className="text-center">
-              {/* Step Number Circle */}
-              <div style={{
-                width: '64px',
-                height: '64px',
-                borderRadius: '50%',
-                background: 'var(--accent)',
-                color: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '32px',
-                fontWeight: 700,
-                margin: '0 auto 24px auto',
-              }}>
-                {step.number}
-              </div>
-
-              {/* Visual Icon */}
-              <div style={{
-                fontSize: '48px',
-                marginBottom: '16px',
-              }}>
-                {step.visual}
-              </div>
-
-              {/* Title */}
-              <h3 style={{
-                fontSize: '20px',
-                fontWeight: 600,
-                marginBottom: '12px',
-                color: 'var(--text-primary)',
-              }}>
-                {step.title}
-              </h3>
-
-              {/* Description */}
-              <p style={{
-                fontSize: '16px',
-                lineHeight: 1.6,
-                color: 'var(--text-tertiary)',
-              }}>
-                {step.description}
-              </p>
-
-              {/* Arrow (except last item) */}
-              {index < steps.length - 1 && (
-                <div className="hidden lg:block" style={{
-                  position: 'absolute',
-                  right: '-40px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  fontSize: '24px',
-                  color: 'var(--text-muted)',
+            <FadeInView key={index} delay={0.2 + index * 0.1}>
+              <div className="text-center relative">
+                {/* Step Number Circle */}
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '50%',
+                  background: 'var(--accent)',
+                  color: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '32px',
+                  fontWeight: 700,
+                  margin: '0 auto 24px auto',
+                  position: 'relative',
                 }}>
-                  →
+                  {/* Glow effect */}
+                  <span style={{
+                    position: 'absolute',
+                    inset: 0,
+                    borderRadius: '50%',
+                    background: 'var(--accent)',
+                    filter: 'blur(20px)',
+                    opacity: 0.5,
+                    zIndex: -1,
+                  }} />
+                  {step.number}
                 </div>
-              )}
-            </div>
+
+                {/* Visual Icon */}
+                <div style={{
+                  fontSize: '48px',
+                  marginBottom: '16px',
+                }}>
+                  {step.visual}
+                </div>
+
+                {/* Title */}
+                <h3 style={{
+                  fontSize: '20px',
+                  fontWeight: 600,
+                  marginBottom: '12px',
+                  color: 'var(--text-primary)',
+                }}>
+                  {step.title}
+                </h3>
+
+                {/* Description */}
+                <p style={{
+                  fontSize: '16px',
+                  lineHeight: 1.6,
+                  color: 'var(--text-tertiary)',
+                }}>
+                  {step.description}
+                </p>
+
+                {/* Arrow (except last item) */}
+                {index < steps.length - 1 && (
+                  <div className="hidden lg:block" style={{
+                    position: 'absolute',
+                    right: '-40px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    fontSize: '24px',
+                    color: 'var(--accent)',
+                    opacity: 0.6,
+                  }}>
+                    →
+                  </div>
+                )}
+              </div>
+            </FadeInView>
           ))}
         </div>
 
         {/* Flow Diagram Placeholder */}
-        <div style={{
-          marginTop: '60px',
-          background: 'var(--bg-secondary)',
-          borderRadius: '16px',
-          padding: '40px',
-          border: '1px solid var(--border-primary)',
-        }}>
-          <p style={{
-            textAlign: 'center',
-            color: 'var(--text-tertiary)',
-            fontSize: '14px',
+        <FadeInView delay={0.7}>
+          <div style={{
+            marginTop: '60px',
+            background: 'var(--bg-secondary)',
+            borderRadius: '16px',
+            padding: '40px',
+            border: '1px solid var(--border-primary)',
           }}>
-            [Flow Diagram: Animated visualization of avatars moving through each step]
-          </p>
-        </div>
+            <p style={{
+              textAlign: 'center',
+              color: 'var(--text-tertiary)',
+              fontSize: '14px',
+            }}>
+              [Flow Diagram: Animated visualization of avatars moving through each step]
+            </p>
+          </div>
+        </FadeInView>
       </div>
     </section>
   );
