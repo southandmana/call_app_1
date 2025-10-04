@@ -90,7 +90,7 @@ export const authOptions: NextAuthOptions = {
   },
 
   pages: {
-    signIn: '/',  // Redirect to home page for sign in
+    signIn: '/auth/signin',  // Redirect to dedicated sign-in page
   },
 
   session: {
